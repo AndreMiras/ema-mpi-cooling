@@ -1,10 +1,18 @@
 #include <mpi.h>
 #include <stdio.h>
 
+void init_neighbours_array(int neighbours_array[], int neighbours_array_size)
+{
+	for (int i=0; i < neighbours_array_size; i++)
+	{
+		neighbours_array[i] = i;
+	}
+}
+
 int main( int argc, char *argv[] )
 {
 	const int nb_instances = 2;
-	int i, compteur;
+	int i;
 	MPI_Status etat;
 
 	char *cmds[nb_instances] = {
@@ -54,15 +62,38 @@ int main( int argc, char *argv[] )
 	// Le père communique de façon synchrone avec chacun de
 	// ses fils en utilisant l'espace de communication intercomm
 
+	const int neighbours_array_size = 8;
+	int neighbours_array[neighbours_array_size]; // neighbours array to be sent
+	init_neighbours_array(neighbours_array, neighbours_array_size);
 	for (i=0; i<5; i++)
 	{
-		MPI_Send (&compteur,1,MPI_INT,i,0,intercomm);
+		MPI_Send(
+			// buffer représente l’adresse en mémoire du tableau de données à envoyer
+			&neighbours_array,
+			// nombreDeDonnees correspond à la taille de ce tableau
+			neighbours_array_size,
+			// typeDeDonnee permet de « typer » les données qui sont
+			// envoyées vers le destinataire. Les valeurs possibles pour
+			// ce paramètre sont présentées un peu plus loin.
+			MPI_INT,
+			// destination est le numéro du processus (ou processeur)
+			// destination dans l’espace de communication considéré.
+			i,
+			// tag est un entier qui permet de différencier plusieurs
+			// messages à destination d’un même processus (nous
+			// pouvons le considérer comme un numéro de canal).
+			0,
+			// permet de spécifier l’ensemble des
+			// processus (ou processeurs) concernés par cette
+			// communication. Si tous les nœuds sont concernés alors
+			// espaceDeComm vaut MPI_COMM_WORLD.
+			intercomm);
 
-		printf ("Pere : Envoi vers %d.\n", i);
+		printf("Pere : Envoi vers %d.\n", i);
 
-		MPI_Recv(&compteur, 1, MPI_INT,i, 0, intercomm, &etat);
+		// MPI_Recv(&compteur, 1, MPI_INT, i, 0, intercomm, &etat);
 
-		printf ("Pere : Reception de %d.\n", i);
+		printf("Pere : Reception de %d.\n", i);
 
 	}
 
