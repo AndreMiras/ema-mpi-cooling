@@ -12,12 +12,9 @@ int main( int argc, char *argv[] )
 	};
 
 	int np[2] = {
-		2,
-		3
+		2,	// On lance 2 instances du programme 1
+		3	// On lance 3 instances du programme 2
 	};
-
-	// On lance 2 instances du programme 1
-	// On lance 3 instances du programme 2
 
 	// Pas d'info supplémentaires pour contrôler le lancement
 	// des programmes 1 et 2
