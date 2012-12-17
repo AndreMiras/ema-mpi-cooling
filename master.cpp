@@ -1,3 +1,4 @@
+#include "utils.h"
 #include <mpi.h>
 #include <stdio.h>
 #include <vector>
@@ -274,7 +275,6 @@ void get_calculator_row_col(
 	int& row,
 	int& col)
 {
-	cout << "get_calculator_row_col for calculator_number:" << calculator_number << endl;
 	bool calculator_row_col_found = false;
 	row = matrix_row_size;
 	while (row >= 0 && !calculator_row_col_found)
@@ -287,7 +287,6 @@ void get_calculator_row_col(
 			calculator_row_col_found = (matrix[row][col] == calculator_number);
 		}
 	}
-	cout << "row:" << row << " col:" << col << endl;
 }
 
 void init_neighbours_array(int neighbours_array[], int neighbours_array_size)
@@ -327,9 +326,20 @@ void init_matrix(vector<vector<int> >& matrix, const int matrix_row_size, const 
 
 }
 
+/*
+ * Phase 3: un float correspondant à la temperature initiale du carré (fixée en dur, puis lue dans un fichier de config)
+ * TODO: get from config file
+ */
+float get_initial_temperature()
+{
+	float initial_temperature = 10.0; // TODO: get from config file
+	return initial_temperature;
+}
+
 int main(int argc, char *argv[])
 {
 	const int nb_instances = 2;
+	const int tag = 0;
 	MPI_Status etat;
 
 	char *cmds[nb_instances] = {
@@ -379,7 +389,7 @@ int main(int argc, char *argv[])
 	// Le père communique de façon synchrone avec chacun de
 	// ses fils en utilisant l'espace de communication intercomm
 
-	const int neighbours_array_size = 8;
+	const int neighbours_array_size = NB_NEIGHBOURS;
 	int neighbours_array[neighbours_array_size]; // neighbours array to be sent
 	const int matrix_row_size = 3;
 	const int matrix_col_size = 3;
@@ -389,9 +399,9 @@ int main(int argc, char *argv[])
 	init_matrix(matrix, matrix_row_size, matrix_col_size);
 	display_matrix(matrix);
 	int calculator_row, calculator_col;
-	for (int i=0; i<5; i++)
+	for (int dest=0; dest<5; dest++)
 	{
-		get_calculator_row_col(i, matrix, matrix_row_size, matrix_col_size, calculator_row, calculator_col);
+		get_calculator_row_col(dest, matrix, matrix_row_size, matrix_col_size, calculator_row, calculator_col);
 		get_neighbours_array_from_matrix(
 				matrix,
 				matrix_row_size,
@@ -400,6 +410,41 @@ int main(int argc, char *argv[])
 				calculator_col,
 				neighbours_array,
 				neighbours_array_size);
+
+		/* Creates a structure containing neighbours_array and initial_temperature to send them all in one go */
+
+		/* creates a type for struct calculator_init */
+		MPI_Datatype mpi_calculator_init_type;
+		create_mpi_calculator_init_type(mpi_calculator_init_type);
+		/*
+		const int nitems = 3;	// neighbours_array, neighbours_array_size and initial_temperature
+		int blocklengths[nitems] = {
+				8,	// each case has 8 neighbours
+				1,
+				1
+		};
+		MPI_Datatype types[nitems] = {MPI_INT, MPI_INT, MPI_INT};
+		MPI_Datatype mpi_calculator_init_type;
+		MPI_Aint offsets[nitems];
+
+		offsets[0] = offsetof(calculator_init, neighbours_array);
+		offsets[1] = offsetof(calculator_init, neighbours_array_size);
+		offsets[2] = offsetof(calculator_init, initial_temperature);
+
+		MPI_Type_create_struct(nitems, blocklengths, offsets, types, &mpi_calculator_init_type);
+		MPI_Type_commit(&mpi_calculator_init_type);
+		*/
+
+		// Sets neighbours_array and initial_temperature
+		calculator_init calculator_init1;
+		memcpy(calculator_init1.neighbours_array, neighbours_array, neighbours_array_size * sizeof(int));
+		calculator_init1.initial_temperature = get_initial_temperature();
+		printf("calculator_init1.initial_temperature = %f\n", calculator_init1.initial_temperature);
+
+		// Sends neighbours_array and initial_temperature
+		// MPI_Send(&calculator_init1, 1, mpi_calculator_init_type, dest, tag, MPI_COMM_WORLD);
+		MPI_Send(&calculator_init1, 1, mpi_calculator_init_type, dest, tag, intercomm);
+		/*
 		MPI_Send(
 			// buffer représente l’adresse en mémoire du tableau de données à envoyer
 			&neighbours_array,
@@ -411,21 +456,21 @@ int main(int argc, char *argv[])
 			MPI_INT,
 			// destination est le numéro du processus (ou processeur)
 			// destination dans l’espace de communication considéré.
-			i,
+			dest,
 			// tag est un entier qui permet de différencier plusieurs
 			// messages à destination d’un même processus (nous
 			// pouvons le considérer comme un numéro de canal).
-			0,
+			tag,
 			// permet de spécifier l’ensemble des
 			// processus (ou processeurs) concernés par cette
 			// communication. Si tous les nœuds sont concernés alors
 			// espaceDeComm vaut MPI_COMM_WORLD.
 			intercomm);
+		*/
+		printf("Parent: Sending to %d.\n", dest);
 
-		printf("Parent: Sending to %d.\n", i);
-
-		// MPI_Recv(&compteur, 1, MPI_INT, i, 0, intercomm, &etat);
-		// printf("Parent: Receiving from %d.\n", i);
+		// MPI_Recv(&compteur, 1, MPI_INT, dest, 0, intercomm, &etat);
+		// printf("Parent: Receiving from %d.\n", dest);
 
 	}
 
