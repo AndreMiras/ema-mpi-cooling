@@ -11,8 +11,8 @@ exec_cmd()
     fi
 }
 
-exec_cmd "mpic++ master.cpp -o dist/MPIcpp/GNU-Linux-x86/master"
-exec_cmd "mpic++ calculator_slave.cpp -o dist/MPIcpp/GNU-Linux-x86/calculator_slave"
+exec_cmd "mpic++ -g master.cpp -o dist/MPIcpp/GNU-Linux-x86/master"
+exec_cmd "mpic++ -g calculator_slave.cpp -o dist/MPIcpp/GNU-Linux-x86/calculator_slave"
 
 echo "run with:"
 echo "mpirun -np 1 dist/MPIcpp/GNU-Linux-x86/master"

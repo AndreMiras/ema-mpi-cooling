@@ -21,10 +21,10 @@ int main( int argc, char *argv[] )
 	MPI_Comm parent;
 	MPI_Status etat;
 
-	MPI_Init (&argc, &argv);
+	MPI_Init(&argc, &argv);
 
-	MPI_Comm_get_parent (&parent);
-	MPI_Comm_rank (MPI_COMM_WORLD, &myrank);
+	MPI_Comm_get_parent(&parent);
+	MPI_Comm_rank(MPI_COMM_WORLD, &myrank);
 
 	if (parent == MPI_COMM_NULL)
 	{
