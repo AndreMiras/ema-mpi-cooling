@@ -1,4 +1,7 @@
+#include <vector>
 #include <mpi.h>
+
+using namespace std;
 
 #define NB_NEIGHBOURS 8
 /*
@@ -11,3 +14,5 @@ typedef struct calculator_init_s {
 
 
 void create_mpi_calculator_init_type(MPI_Datatype& mpi_calculator_init_type);
+void display_matrix(const vector<vector<int> > matrix);
+void display_array(const int array[], const int array_size);

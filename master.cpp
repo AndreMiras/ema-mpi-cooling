@@ -297,18 +297,6 @@ void init_neighbours_array(int neighbours_array[], int neighbours_array_size)
 	}
 }
 
-void display_matrix(const vector<vector<int> > matrix)
-{
-	for (int row=0; row < matrix.size(); row++)
-	{
-		for (int col=0; col < matrix[row].size(); col++)
-		{
-			cout << matrix[row][col] << "\t";
-		}
-		cout << endl;
-	}
-}
-
 void init_matrix(vector<vector<int> >& matrix, const int matrix_row_size, const int matrix_col_size)
 {
 	vector<int> array;
@@ -397,6 +385,7 @@ int main(int argc, char *argv[])
 	int calculator_num = 0;
 	vector<vector<int> > matrix;
 	init_matrix(matrix, matrix_row_size, matrix_col_size);
+	cout << "matrix[" << matrix.size() << "][" << matrix[0].size() << "] = ";
 	display_matrix(matrix);
 	int calculator_row, calculator_col;
 	for (int dest=0; dest<5; dest++)

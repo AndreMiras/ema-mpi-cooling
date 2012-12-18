@@ -1,16 +1,48 @@
 #include "utils.h"
+#include <vector>
 #include <mpi.h>
 #include <stdio.h>
 #include <iostream>
 
 using namespace std;
 
-void print_array(int array[], int array_size)
+enum {
+	NORTH_INDEX,
+	NORTH_EAST_INDEX,
+	EAST_INDEX,
+	SOUTH_EAST_INDEX,
+	SOUTH_INDEX,
+	SOUTH_WEST_INDEX,
+	WEST_INDEX,
+	NORTH_WEST_INDEX,
+};
+
+/*
+ * Recreates a neighbours matrix from a given flat neighbours_array
+ * 1 2 5 8 7 6 3 0
+ * 0       1       2
+ * 3       4       5
+ * 6       7       8
+ */
+void create_matrix_from_neighbours_array(const int neighbours_array[], const int array_size, const int myrank, vector<vector<int> >& matrix)
 {
-	for(int i=0; i<array_size; i++)
-	{
-		printf("array[%i]: %i\n", i, array[i]);
-	}
+	vector<int> array_vector;
+	array_vector.push_back(neighbours_array[NORTH_WEST_INDEX]);
+	array_vector.push_back(neighbours_array[NORTH_INDEX]);
+	array_vector.push_back(neighbours_array[NORTH_EAST_INDEX]);
+	matrix.push_back(array_vector);
+
+	array_vector.clear();
+	array_vector.push_back(neighbours_array[WEST_INDEX]);
+	array_vector.push_back(myrank);
+	array_vector.push_back(neighbours_array[EAST_INDEX]);
+	matrix.push_back(array_vector);
+
+	array_vector.clear();
+	array_vector.push_back(neighbours_array[SOUTH_WEST_INDEX]);
+	array_vector.push_back(neighbours_array[SOUTH_INDEX]);
+	array_vector.push_back(neighbours_array[SOUTH_EAST_INDEX]);
+	matrix.push_back(array_vector);
 }
 
 int main( int argc, char *argv[] )
@@ -48,7 +80,13 @@ int main( int argc, char *argv[] )
 		printf("Rank %d: Received: temperature = %f\n", myrank, recv.initial_temperature);
 
 		printf("Child %d : %s : Receiving from parent!\n", myrank, prog_name.c_str());
-		print_array(recv.neighbours_array, NB_NEIGHBOURS);
+		cout << "neighbours_array[" << NB_NEIGHBOURS << "] = ";
+		display_array(recv.neighbours_array, NB_NEIGHBOURS);
+		vector<vector<int> > matrix;
+		create_matrix_from_neighbours_array(recv.neighbours_array, NB_NEIGHBOURS, myrank, matrix);
+		cout << "neighbours_matrix[" << matrix.size() << "][" << matrix[0].size() << "] = ";
+		display_matrix(matrix);
+		cout << endl;
 
 		// MPI_Send(&compteur, 1, MPI_INT, 0, 0, parent);
 		// printf("Child %d : %s : Sending to parent!\n", myrank, prog_name.c_str());
