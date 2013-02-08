@@ -10,7 +10,7 @@
         android:layout_height="fill_parent"
         android:enabled="true"
         android:clickable="true"
-        android:apiKey="04-vjROExFd2WWeWHJ-dOhm5-S1t59w4X3trFxw"
+        android:apiKey="04-vjROExFd14IbYTlkF0pI39P24uo1q4rP8ktg"
         />
 
    <Button
