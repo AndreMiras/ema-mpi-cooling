@@ -1,6 +1,12 @@
 package com.example.guesswhatgame_bauerdonnadieu;
 
+/**
+ * https://developers.google.com/maps/documentation/android/v1/hello-mapview
+ */
+
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Random;
 
 import android.content.Intent;
 import android.graphics.drawable.Drawable;
@@ -17,9 +23,10 @@ import com.google.android.maps.OverlayItem;
 
 public class MyMapActivity extends MapActivity {
 
-	private MapView m_mapView;
+	private MapView mMapView;
 	private MapController mController;
-	// private MyItemizedOverlay images;
+	private MyItemizedOverlay itemizedOverlay;
+	private Random randomGenerator;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -27,27 +34,77 @@ public class MyMapActivity extends MapActivity {
 		setContentView(R.layout.activity_map);
 		setupMapView();
 		loadMarkers();
+		optimalMapSetup();
 	}
 
-	private void setupMapView()
-	{
-		m_mapView = (MapView) findViewById(R.id.map_view);
-        m_mapView.setBuiltInZoomControls(true);
-		mController = m_mapView.getController();
-        mController.animateTo(new GeoPoint(48625002, 2442962));
-        mController.setZoom(18);
+	private void setupMapView() {
+		mMapView = (MapView) findViewById(R.id.map_view);
+		mMapView.setBuiltInZoomControls(true);
+		mController = mMapView.getController();
+
+		// sets the default marker for all overlay items
+		Drawable drawable = this.getResources()
+				.getDrawable(R.drawable.blue_dot);
+		itemizedOverlay = new MyItemizedOverlay(drawable,
+				this);
+		List<Overlay> mapOverlays = mMapView.getOverlays();
+		mapOverlays.add(itemizedOverlay);
 	}
 
-	private void loadMarkers()
+	private void optimalMapSetup()
 	{
-        List<Overlay> mapOverlays = m_mapView.getOverlays();
-        Drawable drawable = this.getResources().getDrawable(R.drawable.blue_dot);
-        MyItemizedOverlay itemizedoverlay = new MyItemizedOverlay(drawable, this);
+		mController.zoomToSpan(
+				itemizedOverlay.getLatSpanE6(),
+				itemizedOverlay.getLonSpanE6());
+	}
 
-        GeoPoint point = new GeoPoint(48625119, 2442082);
-        OverlayItem overlayitem = new OverlayItem(point, "Item 1", "Item 1 description");
-        itemizedoverlay.addOverlay(overlayitem);
-        mapOverlays.add(itemizedoverlay);
+	// TODO: we should be loading them from XML files or something like that
+	private void loadMarkers() {
+		ArrayList<String> markerDescriptions = new ArrayList<String>();
+		int nbClues = 5;
+		for (int i = 0; i < nbClues; i++) {
+			markerDescriptions.add("Clue " + i);
+		}
+		addRandomMarkers(markerDescriptions);
+	}
+
+	private void addRandomMarkers(ArrayList<String> markerDescriptions) {
+		randomGenerator = new Random();
+		for (String markerDescription : markerDescriptions) {
+			addRandomMarker(markerDescription);
+		}
+	}
+
+	// TODO: Get available points from an XML file and "randomize" it
+	/**
+	 *
+	 * @return a random GeoPoint that isn't already used
+	 */
+	private GeoPoint getRandomGeoPoint() {
+		// generates random lat long
+		// TODO: this is for debugging purposes, but the GeoPoint must be
+		// physically reachable
+		int maxLat = 90;
+		int maxLng = 180;
+		//
+		int randomLat = getRandomInt(-maxLat, maxLat);
+		int randomLng = getRandomInt(-maxLng, maxLng);
+		// converts to micro dedegrees GeoPoint
+		GeoPoint point = new GeoPoint((int) (randomLat * 1E6),
+				(int) (randomLng * 1E6));
+
+		return point;
+	}
+
+	private int getRandomInt(int min, int max) {
+		return randomGenerator.nextInt(max - min + 1) + min;
+	}
+
+	private void addRandomMarker(String markerDescription) {
+		GeoPoint point = getRandomGeoPoint();
+		OverlayItem overlayitem = new OverlayItem(point, "Clue",
+				markerDescription);
+		itemizedOverlay.addOverlay(overlayitem);
 	}
 
 	@Override
@@ -57,11 +114,10 @@ public class MyMapActivity extends MapActivity {
 		return true;
 	}
 
-	public void goToSolveActivityClick(View v)
-    {	
-		Intent activity = new Intent(this,SolveActivity.class);
+	public void goToSolveActivityClick(View v) {
+		Intent activity = new Intent(this, SolveActivity.class);
 		startActivity(activity);
-    }
+	}
 
 	@Override
 	protected boolean isRouteDisplayed() {
