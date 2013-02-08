@@ -23,7 +23,7 @@ public class SolveActivity extends Activity {
 	
 	public void goToMapActivityClick(View v)
     {	
-		Intent activity = new Intent(this,MapActivity.class);
+		Intent activity = new Intent(this,MyMapActivity.class);
 		startActivity(activity);
     }
 
