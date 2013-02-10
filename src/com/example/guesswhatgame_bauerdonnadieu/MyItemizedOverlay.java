@@ -8,14 +8,20 @@ import java.util.ArrayList;
 import android.app.AlertDialog;
 import android.content.Context;
 import android.graphics.drawable.Drawable;
+import android.location.Location;
+import android.location.LocationListener;
+import android.location.LocationManager;
+import android.os.Bundle;
 
 import com.google.android.maps.ItemizedOverlay;
 import com.google.android.maps.OverlayItem;
 
-public class MyItemizedOverlay extends ItemizedOverlay {
+public class MyItemizedOverlay extends ItemizedOverlay<OverlayItem> implements LocationListener {
 
 	private ArrayList<OverlayItem> mOverlays = new ArrayList<OverlayItem>();
-	Context mContext;
+	private Context mContext;
+	private LocationManager locationManager;
+	private String provider;
 
 	public MyItemizedOverlay(Drawable defaultMarker) {
 		super(boundCenterBottom(defaultMarker));
@@ -41,6 +47,8 @@ public class MyItemizedOverlay extends ItemizedOverlay {
 	  return onTapPopup(2);
 	}
 
+	// TODO: we may later display the popup automatically when the user is close enough
+	// this could be done using Proximity Alert
 	private boolean onTapPopup(int index) {
 		OverlayItem item = mOverlays.get(index);
 		AlertDialog.Builder dialog = new AlertDialog.Builder(mContext);
@@ -48,6 +56,17 @@ public class MyItemizedOverlay extends ItemizedOverlay {
 		dialog.setMessage(item.getSnippet());
 		dialog.show();
 		return true;
+	}
+
+	/**
+	 *
+	 * @param index of the clicked marker
+	 * @return true if the user is close enough to the marker
+	 */
+	private boolean isCloseEnough(int index)
+	{
+		OverlayItem item = mOverlays.get(index);
+		return false;
 	}
 
 	// TODO: crashing: You are only allowed to have a single MapView in a
@@ -79,6 +98,27 @@ public class MyItemizedOverlay extends ItemizedOverlay {
 	@Override
 	public int size() {
 		return mOverlays.size();
+	}
+
+	@Override
+	public void onLocationChanged(Location location) {
+		double longitude = location.getLongitude();
+		double latitude = location.getLatitude();
+	}
+
+	@Override
+	public void onProviderDisabled(String provider) {
+		// TODO Auto-generated method stub
+	}
+
+	@Override
+	public void onProviderEnabled(String provider) {
+		// TODO Auto-generated method stub
+	}
+
+	@Override
+	public void onStatusChanged(String provider, int status, Bundle extras) {
+		// TODO Auto-generated method stub
 	}
 
 }

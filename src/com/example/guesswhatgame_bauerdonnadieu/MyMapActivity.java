@@ -8,8 +8,10 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 
+import android.content.Context;
 import android.content.Intent;
 import android.graphics.drawable.Drawable;
+import android.location.LocationManager;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.View;
@@ -26,6 +28,7 @@ public class MyMapActivity extends MapActivity {
 
 	private MapView mMapView;
 	private MapController mController;
+	private LocationManager locationManager;
 	private MyItemizedOverlay itemizedOverlay;
 	private MyLocationOverlay myLocationOverlay;
 	private Random randomGenerator;
@@ -37,6 +40,7 @@ public class MyMapActivity extends MapActivity {
 		setupMapView();
 		loadMarkers();
 		optimalMapSetup();
+		setupLocationManager();
 	}
 
 	private void setupMapView() {
@@ -75,6 +79,28 @@ public class MyMapActivity extends MapActivity {
 		mController.zoomToSpan(
 				itemizedOverlay.getLatSpanE6(),
 				itemizedOverlay.getLonSpanE6());
+	}
+
+	private void setupLocationManager()
+	{
+		// getSystemService
+		// Get the location manager
+	    locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
+	    /*
+	    // Define the criteria how to select the locatioin provider -> use
+	    // default
+	    Criteria criteria = new Criteria();
+	    provider = locationManager.getBestProvider(criteria, false);
+		Location location = locationManager.getLastKnownLocation(provider);
+		// Initialize the location fields
+		if (location != null) {
+			// System.out.println("Provider " + provider + " has been selected.");
+			onLocationChanged(location);
+		} else {
+			// latituteField.setText("Location not available");
+			// longitudeField.setText("Location not available");
+		}
+	     */
 	}
 
 	// TODO: we should be loading them from XML files or something like that
@@ -146,22 +172,30 @@ public class MyMapActivity extends MapActivity {
 	}
 
 	/**
-	 * Disables myLocationOverlay
+	 * Disables:
+	 *	- myLocationOverlay
+	 * 	- location updates requests
 	 */
 	@Override
 	protected void onPause()
 	{
 		super.onPause();
 		myLocationOverlay.disableMyLocation();
+		locationManager.removeUpdates(itemizedOverlay);
 	}
 
 	/**
-	 * Enables myLocationOverlay
+	 * Enables:
+	 *	- myLocationOverlay
+	 * 	- location updates requests
 	 */
 	@Override
-	protected void onResume()
-	{
+	protected void onResume() {
 		super.onResume();
 		myLocationOverlay.enableMyLocation();
+
+		// Starts listeners
+		locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 0,
+				1, itemizedOverlay);
 	}
 }
