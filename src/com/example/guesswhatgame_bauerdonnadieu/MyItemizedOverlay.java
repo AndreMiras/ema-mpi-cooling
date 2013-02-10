@@ -38,13 +38,37 @@ public class MyItemizedOverlay extends ItemizedOverlay {
 
 	@Override
 	protected boolean onTap(int index) {
-	  OverlayItem item = mOverlays.get(index);
-	  AlertDialog.Builder dialog = new AlertDialog.Builder(mContext);
-	  dialog.setTitle(item.getTitle());
-	  dialog.setMessage(item.getSnippet());
-	  dialog.show();
-	  return true;
+	  return onTapPopup(2);
 	}
+
+	private boolean onTapPopup(int index) {
+		OverlayItem item = mOverlays.get(index);
+		AlertDialog.Builder dialog = new AlertDialog.Builder(mContext);
+		dialog.setTitle(item.getTitle());
+		dialog.setMessage(item.getSnippet());
+		dialog.show();
+		return true;
+	}
+
+	// TODO: crashing: You are only allowed to have a single MapView in a
+	// MapActivity
+	/*
+	private boolean onTapPopup2(int index) {
+		OverlayItem item = mOverlays.get(index);
+		LayoutInflater inflater = (LayoutInflater) mContext
+				.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+		// TODO: is this the correct way to do to get the map view?
+		MapView map = (MapView) ((MapActivity) mContext)
+		.findViewById(R.id.map_view);
+		View popUp = inflater.inflate(R.layout.activity_map, map, false);
+		MapView.LayoutParams mapParams = new MapView.LayoutParams(
+				ViewGroup.LayoutParams.WRAP_CONTENT,
+				ViewGroup.LayoutParams.WRAP_CONTENT, item.getPoint(), 0, 0,
+				MapView.LayoutParams.BOTTOM_CENTER);
+		map.addView(popUp, mapParams);
+		return true;
+	}
+	*/
 
 
 	@Override
