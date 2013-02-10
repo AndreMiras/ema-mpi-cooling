@@ -16,8 +16,8 @@ import com.google.android.maps.GeoPoint;
 import com.google.android.maps.ItemizedOverlay;
 import com.google.android.maps.OverlayItem;
 
-public class MyItemizedOverlay extends ItemizedOverlay<OverlayItem> implements LocationListener {
-
+public class MyItemizedOverlay extends ItemizedOverlay<OverlayItem> implements
+		LocationListener {
 	private ArrayList<OverlayItem> mOverlays = new ArrayList<OverlayItem>();
 	private Context mContext;
 	private Location lastLocation;
@@ -34,6 +34,12 @@ public class MyItemizedOverlay extends ItemizedOverlay<OverlayItem> implements L
 	public void addOverlay(OverlayItem overlay) {
 	    mOverlays.add(overlay);
 	    populate();
+	}
+
+	public void addOverlays(ArrayList<OverlayItem> overlays) {
+		for (OverlayItem overlayItem : overlays) {
+		    mOverlays.add(overlayItem);
+		}
 	}
 
 	public ArrayList<OverlayItem> getOverLays()

@@ -10,6 +10,7 @@ import java.util.Random;
 
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.graphics.drawable.Drawable;
 import android.location.LocationManager;
 import android.os.Bundle;
@@ -25,12 +26,21 @@ import com.google.android.maps.Overlay;
 import com.google.android.maps.OverlayItem;
 
 public class MyMapActivity extends MapActivity {
+	public static final String PREFS_NAME = "MyPrefsFile";
 
 	private MapView mMapView;
 	private MapController mController;
 	private LocationManager locationManager;
 	private MyItemizedOverlay itemizedOverlay;
 	private MyLocationOverlay myLocationOverlay;
+	/*
+	 * The list of all clue markers that could be found in the map
+	 */
+	private ArrayList<OverlayItem> allClueMarkersOverlayItems;
+	/*
+	 * The list of already found clue markers
+	 */
+	private ArrayList<OverlayItem> foundClueMarkersOverlayItems;
 	private Random randomGenerator;
 
 	@Override
@@ -105,12 +115,25 @@ public class MyMapActivity extends MapActivity {
 
 	// TODO: we should be loading them from XML files or something like that
 	private void loadMarkers() {
+		if (allClueMarkersOverlayItems == null)
+		{
+			addRandomMarkers(5); // TODO[hardcoded]: use consts instead
+		}
+		else
+		{
+			itemizedOverlay.addOverlays(allClueMarkersOverlayItems);
+		}
+		// allClueMarkersOverlayItems
+	}
+
+	private void addRandomMarkers(int count)
+	{
 		ArrayList<String> markerDescriptions = new ArrayList<String>();
-		int nbClues = 5;
-		for (int i = 0; i < nbClues; i++) {
+		for (int i = 0; i < count; i++) {
 			markerDescriptions.add("Clue " + i);
 		}
 		addRandomMarkers(markerDescriptions);
+		allClueMarkersOverlayItems = itemizedOverlay.getOverLays();
 	}
 
 	private void addRandomMarkers(ArrayList<String> markerDescriptions) {
@@ -201,5 +224,43 @@ public class MyMapActivity extends MapActivity {
 		// Starts listeners
 		locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 0,
 				1, itemizedOverlay);
+	}
+
+	public void savePreferences() {
+		// We need an Editor object to make preference changes.
+		// All objects are from android.context.Context
+		SharedPreferences settings = getSharedPreferences(PREFS_NAME, 0);
+		SharedPreferences.Editor editor = settings.edit();
+		boolean testBoolValue = false;
+		editor.putBoolean("testBoolValue", testBoolValue);
+
+		// Commit the edits!
+		editor.commit();
+
+		/*
+		 * I'd like to be able to save the whole thing
+		 * allClueMarkersOverlayItems and foundClueMarkersOverlayItems But I
+		 * feel like I'm gonna have to do it myself using either sqlite or raw
+		 * files :(
+		 */
+		/*
+		 * savedInstanceState.putSerializable("allClueMarkersOverlayItems",
+		 * allClueMarkersOverlayItems);
+		 * savedInstanceState.putSerializable("foundClueMarkersOverlayItems",
+		 * foundClueMarkersOverlayItems);
+		 */
+	}
+
+	public void restorePreferences() {
+		SharedPreferences settings = getSharedPreferences(PREFS_NAME, 0);
+		boolean silent = settings.getBoolean("silentMode", false);
+		// setSilent(silent);
+
+		/*
+		 * allClueMarkersOverlayItems = (ArrayList<OverlayItem>)
+		 * savedInstanceState .getSerializable("allClueMarkersOverlayItems");
+		 * foundClueMarkersOverlayItems = (ArrayList<OverlayItem>)
+		 * savedInstanceState .getSerializable("foundClueMarkersOverlayItems");
+		 */
 	}
 }
