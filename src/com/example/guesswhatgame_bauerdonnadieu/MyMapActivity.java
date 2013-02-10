@@ -115,8 +115,12 @@ public class MyMapActivity extends MapActivity {
 
 	private void addRandomMarkers(ArrayList<String> markerDescriptions) {
 		randomGenerator = new Random();
+		String markerTitle;
+		int i = 0;
 		for (String markerDescription : markerDescriptions) {
-			addRandomMarker(markerDescription);
+			markerTitle = "Clue " + i;
+			addRandomMarker(markerTitle, markerDescription);
+			i++;
 		}
 	}
 
@@ -134,8 +138,8 @@ public class MyMapActivity extends MapActivity {
 		int franceLat = 46;
 		int franceLng = 2;
 		//
-		int randomLat = getRandomInt(franceLat - 2, franceLat + 2);
-		int randomLng = getRandomInt(franceLng - 2, franceLng + 2);
+		int randomLat = getRandomInt(franceLat - 1, franceLat + 1);
+		int randomLng = getRandomInt(franceLng - 1, franceLng + 1);
 		// converts to micro dedegrees GeoPoint
 		GeoPoint point = new GeoPoint((int) (randomLat * 1E6),
 				(int) (randomLng * 1E6));
@@ -147,9 +151,9 @@ public class MyMapActivity extends MapActivity {
 		return randomGenerator.nextInt(max - min + 1) + min;
 	}
 
-	private void addRandomMarker(String markerDescription) {
+	private void addRandomMarker(String markerTitle, String markerDescription) {
 		GeoPoint point = getRandomGeoPoint();
-		OverlayItem overlayitem = new OverlayItem(point, "Clue",
+		OverlayItem overlayitem = new OverlayItem(point, markerTitle,
 				markerDescription);
 		itemizedOverlay.addOverlay(overlayitem);
 	}
