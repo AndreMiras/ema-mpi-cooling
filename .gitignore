@@ -1,3 +1,6 @@
+*.jar
+*.class
+R.java
 *.swp
 build/
 dist/
