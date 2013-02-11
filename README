@@ -1,0 +1,4 @@
+= README =
+make -f custom.make
+or
+./build.sh

@@ -1,0 +1,11 @@
+= Release Notes =
+
+== version 3.0 ==
+	- passing neighbours array to slaves
+
+== version 2.0 ==
+	- neighbours creation
+
+== version 1.0 ==
+	- master creation
+	- slave creation from master
