@@ -1,3 +1,4 @@
+#include "master.h"
 #include "utils.h"
 #include <mpi.h>
 #include <stdio.h>
@@ -327,7 +328,24 @@ float get_initial_temperature()
 void send_init_phase_ended_message(MPI_Comm intercomm)
 {
     int message = INIT_PHASE_ENDED;
-    MPI_Send(&message, 1, MPI_INT, 0, 0, intercomm);
+    cout << "send_init_phase_ended_message: INIT_PHASE_ENDED: " << INIT_PHASE_ENDED << endl;
+    MPI_Send(&message, 1, MPI_INT, coordinator_slave_id, tag, intercomm);
+}
+
+void wait_simulation_phase_ended_message(MPI_Comm intercomm)
+{
+	int message;
+	MPI_Status status;
+
+	MPI_Recv(&message, 1, MPI_INT, coordinator_slave_id, tag, intercomm, &status);
+	if (message == SIMULATION_PHASE_ENDED)
+	{  
+		cout << "wait_simulation_phase_ended_message: SIMULATION_PHASE_ENDED" << endl;
+	}
+	else
+	{  
+		cout << "wait_simulation_phase_ended_message: Unexpected message: " << message << endl;
+	}
 }
 
 int main(int argc, char *argv[])
@@ -335,9 +353,6 @@ int main(int argc, char *argv[])
 	const int coordinator_slave_count = 1;
 	const int calculator_slave_count = 4;
 	const int nb_instances = 2;
-	const int tag = 0;
-	const int coordinator_slave_id = 0; // l'id du coordinateur
-	const int calculator_slave_id = 1; // les id esclaves demarrent a 1
 	MPI_Status status;
 
 	char *cmds[nb_instances] = {
@@ -473,7 +488,10 @@ int main(int argc, char *argv[])
 
 	}
 	// 3 fin de la phase d'initialisation
-    send_init_phase_ended_message(intercomm);
+	send_init_phase_ended_message(intercomm);
+
+	// Attend la fin de la simulation (message envoyé par le coordinateur
+	wait_simulation_phase_ended_message(intercomm);
 
 	printf ("Pere : Fin.\n");
 

@@ -11,19 +11,28 @@ void wait_init_phase_ended_message()
 {
     int message;
     MPI_Status status;
-	MPI_Comm parent;
-	MPI_Comm_get_parent(&parent);
+    MPI_Comm parent;
+    MPI_Comm_get_parent(&parent);
 
-    cout << "wait_init_phase_ended_message" << endl;
     MPI_Recv(&message, 1, MPI_INT, 0, 0, parent, &status);
     if (message == INIT_PHASE_ENDED)
     {
-        cout << "INIT_PHASE_ENDED" << endl;
+        cout << "wait_init_phase_ended_message: INIT_PHASE_ENDED" << endl;
     }
     else
     {
-        cout << "Unexpected message: " << message << endl;
+        cout << "wait_init_phase_ended_message: Unexpected message: " << message << endl;
     }
+}
+
+void send_simulation_phase_ended_message()
+{
+    MPI_Comm parent;
+    MPI_Comm_get_parent(&parent);
+
+    int message = SIMULATION_PHASE_ENDED;
+    cout << "send_simulation_phase_ended_message: SIMULATION_PHASE_ENDED: " << SIMULATION_PHASE_ENDED << endl;
+    MPI_Send(&message, 1, MPI_INT, 0, 0, parent);
 }
 
 int main( int argc, char *argv[] )
@@ -73,6 +82,10 @@ int main( int argc, char *argv[] )
 		// TODO: should actually be the other way around
 		// the master sends the coordinator the init phase ended so the coordinator can start its work
         wait_init_phase_ended_message();
+
+        // TODO: simulation code here
+
+        send_simulation_phase_ended_message();
 	}
 
 	MPI_Finalize();
