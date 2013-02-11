@@ -1,1 +1,9 @@
-README
+= README =
+
+== Build ==
+make -f custom.make
+or
+./build.sh
+
+== Run ==
+mpirun -np 1 master

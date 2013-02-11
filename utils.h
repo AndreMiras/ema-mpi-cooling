@@ -12,6 +12,10 @@ typedef struct calculator_init_s {
 	float initial_temperature;
 } calculator_init;
 
+enum message_type {
+	INIT_PHASE_ENDED = 0,
+	SIMULATION_PHASE_ENDED,
+};
 
 void create_mpi_calculator_init_type(MPI_Datatype& mpi_calculator_init_type);
 void display_matrix(const vector<vector<int> > matrix);

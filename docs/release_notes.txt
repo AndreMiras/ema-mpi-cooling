@@ -1,0 +1,12 @@
+= Release Notes =
+
+== version 3.0 ==
+	- passing neighbours array to slaves
+	- coordinator start and creation
+
+== version 2.0 ==
+	- neighbours creation
+
+== version 1.0 ==
+	- master creation
+	- slave creation from master

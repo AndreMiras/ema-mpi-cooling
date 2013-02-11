@@ -324,20 +324,30 @@ float get_initial_temperature()
 	return initial_temperature;
 }
 
+void send_init_phase_ended_message(MPI_Comm intercomm)
+{
+    int message = INIT_PHASE_ENDED;
+    MPI_Send(&message, 1, MPI_INT, 0, 0, intercomm);
+}
+
 int main(int argc, char *argv[])
 {
+	const int coordinator_slave_count = 1;
+	const int calculator_slave_count = 4;
 	const int nb_instances = 2;
 	const int tag = 0;
-	MPI_Status etat;
+	const int coordinator_slave_id = 0; // l'id du coordinateur
+	const int calculator_slave_id = 1; // les id esclaves demarrent a 1
+	MPI_Status status;
 
 	char *cmds[nb_instances] = {
-		"dist/MPIcpp/GNU-Linux-x86/calculator_slave",
-		"dist/MPIcpp/GNU-Linux-x86/calculator_slave"
+		"coordinator_slave",
+		"calculator_slave"
 	};
 
 	int np[nb_instances] = {
-		2,	// On lance 2 instances du programme 1
-		3	// On lance 3 instances du programme 2
+		coordinator_slave_count,	// On lance x instances du programme 1
+		calculator_slave_count		// On lance x instances du programme 2
 	};
 
 	// Pas d'info supplémentaires pour contrôler le lancement
@@ -354,7 +364,7 @@ int main(int argc, char *argv[])
 
 	MPI_Comm_spawn_multiple(
 		// le nombre de programme (la taille des tableaux passés en paramètre).
-		2,
+		nb_instances,
 		// la liste des programmes à exécuter.
 		cmds,
 		// un tableau de tableau de chaînes de caractères contenant les arguments de chaque programme.
@@ -373,7 +383,7 @@ int main(int argc, char *argv[])
 		errcodes
 	);
 
-	printf ("Parent: I ran all instances.\n");
+	printf("Parent: I ran all instances.\n");
 	// Le père communique de façon synchrone avec chacun de
 	// ses fils en utilisant l'espace de communication intercomm
 
@@ -388,7 +398,8 @@ int main(int argc, char *argv[])
 	cout << "matrix[" << matrix.size() << "][" << matrix[0].size() << "] = ";
 	display_matrix(matrix);
 	int calculator_row, calculator_col;
-	for (int dest=0; dest<5; dest++)
+	// on ne communique qu'avec les calculateurs (le coordinateur a l'id 0)
+	for (int dest=calculator_slave_id; dest<=calculator_slave_count; dest++)
 	{
 		get_calculator_row_col(dest, matrix, matrix_row_size, matrix_col_size, calculator_row, calculator_col);
 		get_neighbours_array_from_matrix(
@@ -431,7 +442,6 @@ int main(int argc, char *argv[])
 		printf("calculator_init1.initial_temperature = %f\n", calculator_init1.initial_temperature);
 
 		// Sends neighbours_array and initial_temperature
-		// MPI_Send(&calculator_init1, 1, mpi_calculator_init_type, dest, tag, MPI_COMM_WORLD);
 		MPI_Send(&calculator_init1, 1, mpi_calculator_init_type, dest, tag, intercomm);
 		/*
 		MPI_Send(
@@ -458,10 +468,12 @@ int main(int argc, char *argv[])
 		*/
 		printf("Parent: Sending to %d.\n", dest);
 
-		// MPI_Recv(&compteur, 1, MPI_INT, dest, 0, intercomm, &etat);
+		// MPI_Recv(&compteur, 1, MPI_INT, dest, 0, intercomm, &status);
 		// printf("Parent: Receiving from %d.\n", dest);
 
 	}
+	// 3 fin de la phase d'initialisation
+    send_init_phase_ended_message(intercomm);
 
 	printf ("Pere : Fin.\n");
 

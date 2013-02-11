@@ -24,7 +24,7 @@ CLEAN_SUBPROJECTS=${CLEAN_SUBPROJECTS_${SUBPROJECTS}}
 
 
 # Project Name
-PROJECTNAME=MPICooling
+PROJECTNAME=mpi-cooling
 
 # Active Configuration
 DEFAULTCONF=Debug
