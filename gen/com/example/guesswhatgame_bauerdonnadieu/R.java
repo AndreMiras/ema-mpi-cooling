@@ -11,26 +11,28 @@ public final class R {
     public static final class attr {
     }
     public static final class drawable {
-        public static final int ic_launcher=0x7f020000;
+        public static final int blue_dot=0x7f020000;
+        public static final int ic_launcher=0x7f020001;
     }
     public static final class id {
-        public static final int btn_map=0x7f07000b;
-        public static final int btn_solve=0x7f070000;
-        public static final int btn_start=0x7f07000f;
-        public static final int button1=0x7f070001;
-        public static final int button2=0x7f070002;
-        public static final int button3=0x7f070003;
-        public static final int buttonTry=0x7f07000e;
-        public static final int editSolution=0x7f070007;
-        public static final int menu_settings=0x7f070010;
-        public static final int textClue1=0x7f070005;
-        public static final int textClue1Val=0x7f070004;
-        public static final int textClue2=0x7f070008;
-        public static final int textClue2Val=0x7f070006;
-        public static final int textClue3=0x7f070009;
-        public static final int textClue3Val=0x7f07000c;
-        public static final int textClues=0x7f07000d;
-        public static final int textEnterSolution=0x7f07000a;
+        public static final int btn_map=0x7f07000c;
+        public static final int btn_solve=0x7f070001;
+        public static final int btn_start=0x7f070010;
+        public static final int button1=0x7f070002;
+        public static final int button2=0x7f070003;
+        public static final int button3=0x7f070004;
+        public static final int buttonTry=0x7f07000f;
+        public static final int editSolution=0x7f070008;
+        public static final int map_view=0x7f070000;
+        public static final int menu_settings=0x7f070011;
+        public static final int textClue1=0x7f070006;
+        public static final int textClue1Val=0x7f070005;
+        public static final int textClue2=0x7f070009;
+        public static final int textClue2Val=0x7f070007;
+        public static final int textClue3=0x7f07000a;
+        public static final int textClue3Val=0x7f07000d;
+        public static final int textClues=0x7f07000e;
+        public static final int textEnterSolution=0x7f07000b;
     }
     public static final class layout {
         public static final int activity_map=0x7f030000;

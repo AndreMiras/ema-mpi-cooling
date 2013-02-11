@@ -25,7 +25,7 @@ public class StartActivity extends Activity
 	
 	public void goToMapActivityClick(View v)
     {	
-		Intent activity = new Intent(this,MapActivity.class);
+		Intent activity = new Intent(this,MyMapActivity.class);
 		startActivityForResult(activity, RESULT_CLOSE_ALL);
     }
 	

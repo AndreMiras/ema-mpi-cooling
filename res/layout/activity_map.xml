@@ -4,6 +4,15 @@
     android:layout_height="match_parent"
     tools:context=".MapActivity" >
 
+    <com.google.android.maps.MapView
+        android:id="@+id/map_view"
+        android:layout_width="fill_parent"
+        android:layout_height="fill_parent"
+        android:enabled="true"
+        android:clickable="true"
+        android:apiKey="04-vjROExFd14IbYTlkF0pI39P24uo1q4rP8ktg"
+        />
+
    <Button
         android:id="@+id/btn_solve"
         android:layout_width="wrap_content"
