@@ -6,10 +6,20 @@
 
 using namespace std;
 
+void send_simulation_phase_ended_message()
+{
+	MPI_Comm parent;
+	MPI_Comm_get_parent(&parent);
+
+	int message = SIMULATION_PHASE_ENDED;
+	MPI_Send(&message, 1, MPI_INT, 0, 0, parent);
+}
+
 int main( int argc, char *argv[] )
 {
 	string prog_name(argv[0]);
 	int myrank;
+	int message;
 	MPI_Comm parent;
 	MPI_Status status;
 
@@ -24,10 +34,15 @@ int main( int argc, char *argv[] )
 		printf("Child %d : %s : No parent!\n", myrank, prog_name.c_str());
 	}
 	else {
-		// MPI_Recv(&compteur, 1, MPI_INT, 0, 0, parent, &status);
-		// TODO: check we can get the actual received size from the status
-		// MPI_Recv(neighbours_array, neighbours_array_size, MPI_INT, 0, 0, parent, &status);
-
+		MPI_Recv(&message, 1, MPI_INT, 0, 0, parent, &status);
+		printf("Child %d : %s : Receiving from parent!\n", myrank, prog_name.c_str());
+		cout << endl;
+		cout << "message: " << message << endl;
+		if (message == INIT_PHASE_ENDED)
+		{
+			cout << "message is type of INIT_PHASE_ENDED!" << endl;
+		}
+		/*
 		const int src = 0;
 		const int tag = 0;
 
@@ -38,11 +53,11 @@ int main( int argc, char *argv[] )
 		create_mpi_calculator_init_type(mpi_calculator_init_type);
 		// MPI_Recv(&recv, 1, mpi_calculator_init_type, src, tag, parent, &status);
 
-		printf("Child %d : %s : Receiving from parent!\n", myrank, prog_name.c_str());
-		cout << endl;
 
 		// MPI_Send(&compteur, 1, MPI_INT, 0, 0, parent);
 		// printf("Child %d : %s : Sending to parent!\n", myrank, prog_name.c_str());
+		*/
+		send_simulation_phase_ended_message();
 	}
 
 	MPI_Finalize();

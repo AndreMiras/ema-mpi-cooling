@@ -326,11 +326,13 @@ float get_initial_temperature()
 
 int main(int argc, char *argv[])
 {
-	const int coordinator_slaves_count = 1;
-	const int calculator_slaves_count = 4;
+	const int coordinator_slave_count = 1;
+	const int calculator_slave_count = 4;
 	const int nb_instances = 2;
 	const int tag = 0;
-	MPI_Status etat;
+	const int coordinator_slave_id = 0; // l'id du coordinateur
+	const int calculator_slave_id = 1; // les id esclaves demarrent a 1
+	MPI_Status status;
 
 	char *cmds[nb_instances] = {
 		"coordinator_slave",
@@ -338,8 +340,8 @@ int main(int argc, char *argv[])
 	};
 
 	int np[nb_instances] = {
-		coordinator_slaves_count,	// On lance x instances du programme 1
-		calculator_slaves_count		// On lance x instances du programme 2
+		coordinator_slave_count,	// On lance x instances du programme 1
+		calculator_slave_count		// On lance x instances du programme 2
 	};
 
 	// Pas d'info supplémentaires pour contrôler le lancement
@@ -391,7 +393,7 @@ int main(int argc, char *argv[])
 	display_matrix(matrix);
 	int calculator_row, calculator_col;
 	// on ne communique qu'avec les calculateurs (le coordinateur a l'id 0)
-	for (int dest=1; dest<=calculator_slaves_count; dest++)
+	for (int dest=calculator_slave_id; dest<=calculator_slave_count; dest++)
 	{
 		get_calculator_row_col(dest, matrix, matrix_row_size, matrix_col_size, calculator_row, calculator_col);
 		get_neighbours_array_from_matrix(
@@ -434,7 +436,6 @@ int main(int argc, char *argv[])
 		printf("calculator_init1.initial_temperature = %f\n", calculator_init1.initial_temperature);
 
 		// Sends neighbours_array and initial_temperature
-		// MPI_Send(&calculator_init1, 1, mpi_calculator_init_type, dest, tag, MPI_COMM_WORLD);
 		MPI_Send(&calculator_init1, 1, mpi_calculator_init_type, dest, tag, intercomm);
 		/*
 		MPI_Send(
@@ -461,11 +462,27 @@ int main(int argc, char *argv[])
 		*/
 		printf("Parent: Sending to %d.\n", dest);
 
-		// MPI_Recv(&compteur, 1, MPI_INT, dest, 0, intercomm, &etat);
+		// MPI_Recv(&compteur, 1, MPI_INT, dest, 0, intercomm, &status);
 		// printf("Parent: Receiving from %d.\n", dest);
 
 	}
+	// TODO[cleaning]: move this to a dedicated function
+	// 3 fin de la phase d'initialisation
+	// TODO[cleaning]: must be a way to send the enum directly
+	int val = INIT_PHASE_ENDED;
+	MPI_Send(&val, 1, MPI_INT, coordinator_slave_id, tag, intercomm);
+	// MPI_Send(message, strlen(message) + 1, MPI_CHAR, SERVER, MSG_WORK_REQUEST, MPI_COMM_WORLD);
 
+	int message;
+	MPI_Recv(&message, 1, MPI_INT, 0, 0, intercomm, &status);
+	if (message == SIMULATION_PHASE_ENDED)
+	{
+		cout << "SIMULATION_PHASE_ENDED" << endl;
+	}
+	else
+	{
+		cout << "Unexpected message: " << message << endl;
+	}
 	printf ("Pere : Fin.\n");
 
 	MPI_Finalize();
