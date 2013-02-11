@@ -324,20 +324,10 @@ float get_initial_temperature()
 	return initial_temperature;
 }
 
-void wait_simulation_phase_ended_message(MPI_Comm intercomm)
+void send_init_phase_ended_message(MPI_Comm intercomm)
 {
-	int message;
-	MPI_Status status;
-
-	MPI_Recv(&message, 1, MPI_INT, 0, 0, intercomm, &status);
-	if (message == SIMULATION_PHASE_ENDED)
-	{
-		cout << "SIMULATION_PHASE_ENDED" << endl;
-	}
-	else
-	{
-		cout << "Unexpected message: " << message << endl;
-	}
+    int message = INIT_PHASE_ENDED;
+    MPI_Send(&message, 1, MPI_INT, 0, 0, intercomm);
 }
 
 int main(int argc, char *argv[])
@@ -483,9 +473,7 @@ int main(int argc, char *argv[])
 
 	}
 	// 3 fin de la phase d'initialisation
-	// TODO: should actually be the other way around
-	// the master sends the coordinator the init phase ended so the coordinator can start its work
-	wait_simulation_phase_ended_message(intercomm);
+    send_init_phase_ended_message(intercomm);
 
 	printf ("Pere : Fin.\n");
 

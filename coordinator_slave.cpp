@@ -6,13 +6,24 @@
 
 using namespace std;
 
-void send_simulation_phase_ended_message()
+
+void wait_init_phase_ended_message()
 {
+    int message;
+    MPI_Status status;
 	MPI_Comm parent;
 	MPI_Comm_get_parent(&parent);
 
-	int message = SIMULATION_PHASE_ENDED;
-	MPI_Send(&message, 1, MPI_INT, 0, 0, parent);
+    cout << "wait_init_phase_ended_message" << endl;
+    MPI_Recv(&message, 1, MPI_INT, 0, 0, parent, &status);
+    if (message == INIT_PHASE_ENDED)
+    {
+        cout << "INIT_PHASE_ENDED" << endl;
+    }
+    else
+    {
+        cout << "Unexpected message: " << message << endl;
+    }
 }
 
 int main( int argc, char *argv[] )
@@ -61,7 +72,7 @@ int main( int argc, char *argv[] )
 		*/
 		// TODO: should actually be the other way around
 		// the master sends the coordinator the init phase ended so the coordinator can start its work
-		send_simulation_phase_ended_message();
+        wait_init_phase_ended_message();
 	}
 
 	MPI_Finalize();
