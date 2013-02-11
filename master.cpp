@@ -324,6 +324,22 @@ float get_initial_temperature()
 	return initial_temperature;
 }
 
+void wait_simulation_phase_ended_message(MPI_Comm intercomm)
+{
+	int message;
+	MPI_Status status;
+
+	MPI_Recv(&message, 1, MPI_INT, 0, 0, intercomm, &status);
+	if (message == SIMULATION_PHASE_ENDED)
+	{
+		cout << "SIMULATION_PHASE_ENDED" << endl;
+	}
+	else
+	{
+		cout << "Unexpected message: " << message << endl;
+	}
+}
+
 int main(int argc, char *argv[])
 {
 	const int coordinator_slave_count = 1;
@@ -466,23 +482,11 @@ int main(int argc, char *argv[])
 		// printf("Parent: Receiving from %d.\n", dest);
 
 	}
-	// TODO[cleaning]: move this to a dedicated function
 	// 3 fin de la phase d'initialisation
-	// TODO[cleaning]: must be a way to send the enum directly
-	int val = INIT_PHASE_ENDED;
-	MPI_Send(&val, 1, MPI_INT, coordinator_slave_id, tag, intercomm);
-	// MPI_Send(message, strlen(message) + 1, MPI_CHAR, SERVER, MSG_WORK_REQUEST, MPI_COMM_WORLD);
+	// TODO: should actually be the other way around
+	// the master sends the coordinator the init phase ended so the coordinator can start its work
+	wait_simulation_phase_ended_message(intercomm);
 
-	int message;
-	MPI_Recv(&message, 1, MPI_INT, 0, 0, intercomm, &status);
-	if (message == SIMULATION_PHASE_ENDED)
-	{
-		cout << "SIMULATION_PHASE_ENDED" << endl;
-	}
-	else
-	{
-		cout << "Unexpected message: " << message << endl;
-	}
 	printf ("Pere : Fin.\n");
 
 	MPI_Finalize();

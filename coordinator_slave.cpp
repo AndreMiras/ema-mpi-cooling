@@ -34,6 +34,7 @@ int main( int argc, char *argv[] )
 		printf("Child %d : %s : No parent!\n", myrank, prog_name.c_str());
 	}
 	else {
+		/*
 		MPI_Recv(&message, 1, MPI_INT, 0, 0, parent, &status);
 		printf("Child %d : %s : Receiving from parent!\n", myrank, prog_name.c_str());
 		cout << endl;
@@ -42,6 +43,7 @@ int main( int argc, char *argv[] )
 		{
 			cout << "message is type of INIT_PHASE_ENDED!" << endl;
 		}
+		*/
 		/*
 		const int src = 0;
 		const int tag = 0;
@@ -57,6 +59,8 @@ int main( int argc, char *argv[] )
 		// MPI_Send(&compteur, 1, MPI_INT, 0, 0, parent);
 		// printf("Child %d : %s : Sending to parent!\n", myrank, prog_name.c_str());
 		*/
+		// TODO: should actually be the other way around
+		// the master sends the coordinator the init phase ended so the coordinator can start its work
 		send_simulation_phase_ended_message();
 	}
 
