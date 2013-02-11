@@ -6,7 +6,9 @@ import android.content.Intent;
 import android.view.Menu;
 import android.view.View;
 
-public class StartActivity extends Activity {
+public class StartActivity extends Activity 
+{
+	private final int RESULT_CLOSE_ALL = 30;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -24,7 +26,20 @@ public class StartActivity extends Activity {
 	public void goToMapActivityClick(View v)
     {	
 		Intent activity = new Intent(this,MapActivity.class);
-		startActivity(activity);
+		startActivityForResult(activity, RESULT_CLOSE_ALL);
     }
+	
+	@Override
+	protected void onActivityResult(int requestCode, int resultCode, Intent data)
+	{
+		switch ( resultCode)
+		{
+			case RESULT_CLOSE_ALL:
+				setResult(RESULT_CLOSE_ALL);
+				StartActivity.this.finish();
+		}
+		
+		super.onActivityResult(requestCode, resultCode, data);
+	}
 
 }

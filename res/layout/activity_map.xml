@@ -14,4 +14,31 @@
         android:text="@string/solve"
         android:onClick="goToSolveActivityClick"/>
 
+   <Button
+       android:id="@+id/button1"
+       android:layout_width="wrap_content"
+       android:layout_height="wrap_content"
+       android:layout_alignParentLeft="true"
+       android:layout_alignParentTop="true"
+       android:text="@string/t_clue1" 
+       android:onClick="fakeClue1" />
+
+   <Button
+       android:id="@+id/button2"
+       android:layout_width="wrap_content"
+       android:layout_height="wrap_content"
+       android:layout_alignParentLeft="true"
+       android:layout_below="@+id/button1"
+       android:text="@string/t_clue2" 
+       android:onClick="fakeClue2" />
+
+   <Button
+       android:id="@+id/button3"
+       android:layout_width="wrap_content"
+       android:layout_height="wrap_content"
+       android:layout_alignParentLeft="true"
+       android:layout_below="@+id/button2"
+       android:text="@string/t_clue3" 
+       android:onClick="fakeClue3" />
+
 </RelativeLayout>
