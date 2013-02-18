@@ -352,6 +352,7 @@ float get_initial_temperature(int process)
 	return initial_temperature;
 }
 
+
 float get_temperature(int calculator_number)
 {
     int row;
@@ -369,6 +370,7 @@ float get_temperature(int calculator_number)
 
     return temperature;
 }
+
 
 void send_init_phase_ended_message(MPI_Comm intercomm)
 {
