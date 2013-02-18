@@ -76,6 +76,92 @@ void receive_init_struct()
     cout << endl;
 }
 
+// Envoi temperature aux voisins
+void send_temperature_to_neighbours()
+{
+    
+}
+
+//Recevoir temperature des voisins
+void recv_temperature_from_neighbours()
+{
+    
+}
+
+//Calculer la nouvelle temperature
+void process_new_temperature()
+{
+        //Tnew = (Tcourant + somme(voisin =0 ? 7)(Treçue[voisin]) ) / 9
+        //(si voisin = -1, alors Treçue[voisin] = 20°C (température ambiante de la plaque))
+}
+
+//Envoi nouvelle temperature au coordinateur
+void send_new_temperature()
+{
+    
+}
+
+// TODO: review this code (written by Del)
+/**
+ * This is step 4
+ */
+void send_end_message()
+{
+    int myrank; //Numéro de processus
+    MPI_Comm parent;
+    MPI_Status etat;
+
+    MPI_Comm_rank (MPI_COMM_WORLD,&myrank);
+
+    int coordinateur;
+
+    //TODO Fonction Reception d'un int
+    //Sinon, en attente de reception
+    //MPI_Recv(&coordinateur, 0, int, 0, 0, parent, &etat); // pas sure pour le "parent"
+
+    if(coordinateur > 0)
+    {
+        //TODO traitement
+        // Envoi temperature aux voisins
+        send_temperature_to_neighbours();
+
+        //Recevoir temperature des voisins
+        recv_temperature_from_neighbours();
+
+        //Calculer la nouvelle temperature
+        process_new_temperature();
+
+        //Envoi nouvelle temperature au coordinateur
+        send_new_temperature();
+        
+        
+        //TODO Back to wait_for_int_from_coord()
+    }
+    else
+    {
+        if(coordinateur == -1 )
+        {
+            if (parent == MPI_COMM_NULL)
+            {
+                printf ("Coordinator %d : Coord : Pas de maitre !\n", myrank);
+            }
+            else
+            {
+                int compteur = 0;
+                cout<<"Fin du traitement du calculator "<<myrank<<endl;
+                
+                //REVIEWWWWWWWWWWWWWWWWWWWWWWWWWWW
+                //MPI_Send(&compteur, 1, MPI_INT, 0, 0,parent );
+                cout<<"Envoi 0 du calculator "<<myrank<<endl;
+            }
+        }
+    }
+
+}
+
+
+
+
 int main(int argc, char *argv[])
 {
 	int neighbours_array[NB_NEIGHBOURS]; // neighbours array to be received
@@ -98,66 +184,18 @@ int main(int argc, char *argv[])
 		// TODO: check we can get the actual received size from the status
 		// MPI_Recv(neighbours_array, neighbours_array_size, MPI_INT, 0, 0, parent, &status);
 
-        receive_init_struct();
+                receive_init_struct();
 
 		// MPI_Send(&compteur, 1, MPI_INT, 0, 0, parent);
 		// printf("Child %d : %s : Sending to parent!\n", myrank, prog_name.c_str());
 	}
+        
+        send_end_message();
 
 	MPI_Finalize();
 	return 0;
 }
 
 
-// TODO: review this code (written by Del)
-/**
- * This is step 4
- */
-void send_end_message()
-{
-    int myrank; //Numéro de processus
-    MPI_Comm parent;
-    MPI_Status etat;
-
-    MPI_Comm_get_parent (&parent);
-    MPI_Comm_rank (MPI_COMM_WORLD,&myrank);
-
-    int coordinateur;
-
-    //TODO Fonction Reception d'un int
-    //Sinon, en attente de reception
-    //MPI_Recv(&coordinateur, 0, int, 0, 0, parent, &etat); // pas sure pour le "parent"
-
-    if(coordinateur > 0)
-    {
-        //TODO traitement
-        // Envoi temperature aux voisins
-
-        //Recevoir temperature des voisins
-
-        //Calculer la nouvelle temperature
-        //Tnew = (Tcourant + somme(voisin =0 ? 7)(Treçue[voisin]) ) / 9
-        //(si voisin = -1, alors Treçue[voisin] = 20°C (température ambiante de la plaque))
 
 
-
-        //Envoi nouvelle temperature au coordinateur
-    }
-    else
-    {
-        if(coordinateur == -1 )
-        {
-            if (parent == MPI_COMM_NULL)
-            {
-                printf ("Coordinator %d : Coord : Pas de maitre !\n", myrank);
-            }
-            else
-            {
-                int compteur = 0;
-                cout<<"Fin du traitement du calculator "<<myrank<<endl;
-                MPI_Send(&compteur, 1, MPI_INT, 0, 0, parent);
-            }
-        }
-    }
-
-}

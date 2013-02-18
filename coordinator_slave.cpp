@@ -35,6 +35,31 @@ void send_simulation_phase_ended_message()
     MPI_Send(&message, 1, MPI_INT, 0, 0, parent);
 }
 
+
+
+int recv_from_calc(int id){
+    int message = 0;
+    MPI_Status status;
+    MPI_Comm parent;
+    MPI_Comm_get_parent(&parent);
+
+    //TODO Reception
+    //MPI_Recv(&message, 1, MPI_INT, id, 0, 1, &status);
+    
+    message++;
+    
+    return message;
+}
+
+void recv_from_all_calc() {
+       int tab[9];
+       for(int i=1; i< 9; i++)
+       {
+             tab[i-1] = recv_from_calc(i);
+             cout<<"Coordinator Tab["<<(i-1)<<"] = "<<tab[i-1]<<endl;
+       }
+}
+
 int main( int argc, char *argv[] )
 {
 	string prog_name(argv[0]);
@@ -83,6 +108,9 @@ int main( int argc, char *argv[] )
 		// the master sends the coordinator the init phase ended so the coordinator can start its work
         wait_init_phase_ended_message();
 
+        recv_from_all_calc();
+
+        
         // TODO: simulation code here
 
         send_simulation_phase_ended_message();
