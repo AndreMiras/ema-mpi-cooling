@@ -42,6 +42,13 @@ void receive_all_new_temperatures()
 
 void send_step_number_to_all_calculators()
 {
+    int step_number = 0; // TODO: hardcoded
+    const int calculators_count = 9; // FIXME: hardcoded
+    for(int i=calculator_slave_id; i< calculators_count)
+    {
+        // TODO
+		// MPI_Send // (&compteur, 1, MPI_INT, 0, 0, parent);
+    }
 }
 
 void send_end_message_to_calculators()

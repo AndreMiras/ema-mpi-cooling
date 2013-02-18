@@ -3,6 +3,9 @@
 
 using namespace std;
 
+const int coordinator_slave_id = 0; // l'id du coordinateur
+const int calculator_slave_id = 1; // les id esclaves demarrent a 1
+
 #define NB_NEIGHBOURS 8
 /*
  * Contains calculator neighbour and initial temperature
