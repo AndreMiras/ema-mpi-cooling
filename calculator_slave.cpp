@@ -1,10 +1,8 @@
+#include "calculator_slave.h"
 #include "utils.h"
 #include <vector>
 #include <mpi.h>
 #include <stdio.h>
-#include <iostream>
-
-using namespace std;
 
 enum {
 	NORTH_INDEX,
@@ -45,14 +43,47 @@ void create_matrix_from_neighbours_array(const int neighbours_array[], const int
 	matrix.push_back(array_vector);
 }
 
-int main( int argc, char *argv[] )
+/**
+ * Receveives the initial structure (step 2), containing:
+ *  - neighbours_array
+ *  - initial_temperature
+ */
+void receive_init_struct()
 {
-	string prog_name(argv[0]);
+    const int src = 0;
+    const int tag = 0;
+	int myrank;
+	MPI_Comm parent;
+	MPI_Status status;
+	MPI_Comm_get_parent(&parent);
+	MPI_Comm_rank(MPI_COMM_WORLD, &myrank);
+
+    calculator_init recv;
+    MPI_Datatype mpi_calculator_init_type;
+
+    create_mpi_calculator_init_type(mpi_calculator_init_type);
+    // MPI_Recv(neighbours_array, neighbours_array_size, MPI_INT, 0, 0, parent, &status);
+    MPI_Recv(&recv, 1, mpi_calculator_init_type, src, tag, parent, &status);
+    printf("Rank %d: Received: temperature = %f\n", myrank, recv.initial_temperature);
+
+    printf("Child %d : %s : Receiving from parent!\n", myrank, prog_name.c_str());
+    cout << "neighbours_array[" << NB_NEIGHBOURS << "] = ";
+    display_array(recv.neighbours_array, NB_NEIGHBOURS);
+    vector<vector<int> > matrix;
+    create_matrix_from_neighbours_array(recv.neighbours_array, NB_NEIGHBOURS, myrank, matrix);
+    cout << "neighbours_matrix[" << matrix.size() << "][" << matrix[0].size() << "] = ";
+    display_matrix<int>(matrix);
+    cout << endl;
+}
+
+int main(int argc, char *argv[])
+{
 	int neighbours_array[NB_NEIGHBOURS]; // neighbours array to be received
 	int myrank;
 	MPI_Comm parent;
 	MPI_Status status;
 
+	prog_name = argv[0];
 	MPI_Init(&argc, &argv);
 
 	MPI_Comm_get_parent(&parent);
@@ -67,26 +98,7 @@ int main( int argc, char *argv[] )
 		// TODO: check we can get the actual received size from the status
 		// MPI_Recv(neighbours_array, neighbours_array_size, MPI_INT, 0, 0, parent, &status);
 
-		const int src = 0;
-		const int tag = 0;
-
-		calculator_init recv;
-
-
-		MPI_Datatype mpi_calculator_init_type;
-		create_mpi_calculator_init_type(mpi_calculator_init_type);
-		// MPI_Recv(neighbours_array, neighbours_array_size, MPI_INT, 0, 0, parent, &status);
-		MPI_Recv(&recv, 1, mpi_calculator_init_type, src, tag, parent, &status);
-		printf("Rank %d: Received: temperature = %f\n", myrank, recv.initial_temperature);
-
-		printf("Child %d : %s : Receiving from parent!\n", myrank, prog_name.c_str());
-		cout << "neighbours_array[" << NB_NEIGHBOURS << "] = ";
-		display_array(recv.neighbours_array, NB_NEIGHBOURS);
-		vector<vector<int> > matrix;
-		create_matrix_from_neighbours_array(recv.neighbours_array, NB_NEIGHBOURS, myrank, matrix);
-		cout << "neighbours_matrix[" << matrix.size() << "][" << matrix[0].size() << "] = ";
-		display_matrix<int>(matrix);
-		cout << endl;
+        receive_init_struct();
 
 		// MPI_Send(&compteur, 1, MPI_INT, 0, 0, parent);
 		// printf("Child %d : %s : Sending to parent!\n", myrank, prog_name.c_str());

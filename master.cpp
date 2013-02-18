@@ -366,10 +366,6 @@ float get_temperature(int calculator_number)
         row,
         col);
     temperature = temperature_matrix.at(row).at(col);
-    cout << "calculator_number: " << calculator_number << endl;
-    cout << "row: " << row << endl;
-    cout << "col: " << col << endl;
-    cout << "temperature: " << temperature << endl << endl;
 
     return temperature;
 }
