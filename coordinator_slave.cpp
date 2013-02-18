@@ -1,3 +1,4 @@
+#include "coordinator_slave.h"
 #include "utils.h"
 #include <vector>
 #include <mpi.h>
@@ -58,6 +59,46 @@ void recv_from_all_calc() {
              tab[i-1] = recv_from_calc(i);
              cout<<"Coordinator Tab["<<(i-1)<<"] = "<<tab[i-1]<<endl;
        }
+}
+
+
+void receive_all_new_temperatures()
+{
+}
+
+void send_step_number_to_all_calculators()
+{
+}
+
+void send_end_message_to_calculators()
+{
+}
+
+float compute_delta_temperature()
+{
+    float delta = 0.0;
+
+    return delta;
+}
+
+/*
+Le processus coordinateur fonctionne de la manière suivante
+ envoie le numéro du pas à tous les calculateurs
+ attends de recevoir toutes les nouvelles températures
+ calcule l’écart “Delta Tmoy”
+ “Delta Tmoy” = “Tmoy_courant” - “Tmoy_new”
+ si “Delta Tmoy” >= Epsilon on recommence, sinon on envoie un message de fin aux calculateurs
+ */
+void step4() // TODO: give relevant name
+{
+    send_step_number_to_all_calculators();
+    receive_all_new_temperatures();
+    float delta_temperature = compute_delta_temperature();
+    if (delta_temperature > epsilon)
+    {
+        step4();
+    }
+    send_end_message_to_calculators();
 }
 
 int main( int argc, char *argv[] )
