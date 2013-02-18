@@ -85,7 +85,7 @@ int main( int argc, char *argv[] )
 		vector<vector<int> > matrix;
 		create_matrix_from_neighbours_array(recv.neighbours_array, NB_NEIGHBOURS, myrank, matrix);
 		cout << "neighbours_matrix[" << matrix.size() << "][" << matrix[0].size() << "] = ";
-		display_matrix(matrix);
+		display_matrix<int>(matrix);
 		cout << endl;
 
 		// MPI_Send(&compteur, 1, MPI_INT, 0, 0, parent);
@@ -94,4 +94,58 @@ int main( int argc, char *argv[] )
 
 	MPI_Finalize();
 	return 0;
+}
+
+
+// TODO: review this code (written by Del)
+/**
+ * This is step 4
+ */
+void send_end_message()
+{
+    int myrank; //Numéro de processus
+    MPI_Comm parent;
+    MPI_Status etat;
+
+    MPI_Comm_get_parent (&parent);
+    MPI_Comm_rank (MPI_COMM_WORLD,&myrank);
+
+    int coordinateur;
+
+    //TODO Fonction Reception d'un int
+    //Sinon, en attente de reception
+    //MPI_Recv(&coordinateur, 0, int, 0, 0, parent, &etat); // pas sure pour le "parent"
+
+    if(coordinateur > 0)
+    {
+        //TODO traitement
+        // Envoi temperature aux voisins
+
+        //Recevoir temperature des voisins
+
+        //Calculer la nouvelle temperature
+        //Tnew = (Tcourant + somme(voisin =0 ? 7)(Treçue[voisin]) ) / 9
+        //(si voisin = -1, alors Treçue[voisin] = 20°C (température ambiante de la plaque))
+
+
+
+        //Envoi nouvelle temperature au coordinateur
+    }
+    else
+    {
+        if(coordinateur == -1 )
+        {
+            if (parent == MPI_COMM_NULL)
+            {
+                printf ("Coordinator %d : Coord : Pas de maitre !\n", myrank);
+            }
+            else
+            {
+                int compteur = 0;
+                cout<<"Fin du traitement du calculator "<<myrank<<endl;
+                MPI_Send(&compteur, 1, MPI_INT, 0, 0, parent);
+            }
+        }
+    }
+
 }
