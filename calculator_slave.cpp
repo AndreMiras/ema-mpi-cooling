@@ -83,22 +83,46 @@ void send_temperature_to_neighbours()
 }
 
 //Recevoir temperature des voisins
-void recv_temperature_from_neighbours()
+void recv_temperature_from_neighbours(int* temperatures)
 {
     
 }
 
 //Calculer la nouvelle temperature
-void process_new_temperature()
+double process_new_temperature(int* temperatures)
 {
-        //Tnew = (Tcourant + somme(voisin =0 ? 7)(Treçue[voisin]) ) / 9
-        //(si voisin = -1, alors Treçue[voisin] = 20°C (température ambiante de la plaque))
+    double temperature;
+     
+        //(si voisin = -1, alors TemperatureReçue[voisin] = 20°C (température ambiante de la plaque))
+    
+    //temperature = (Tcourant + somme(voisin =0 ? 7)(TemperatureReçue[voisin]) ) / 9
+    
+    return temperature;
 }
 
 //Envoi nouvelle temperature au coordinateur
-void send_new_temperature()
+void send_new_temperature(double new_temperature)
 {
     
+}
+
+
+
+void traitement_temperatures()
+{
+    // Envoi temperature aux voisins
+    send_temperature_to_neighbours();
+
+    //Recevoir temperature des voisins
+    int temperatures[9];
+    recv_temperature_from_neighbours(temperatures);
+
+    //Calculer la nouvelle temperature
+    double new_temperature;
+    new_temperature = process_new_temperature(temperatures);
+
+    //Envoi nouvelle temperature au coordinateur
+    send_new_temperature(new_temperature);
 }
 
 // TODO: review this code (written by Del)
@@ -120,21 +144,8 @@ void send_end_message()
     //MPI_Recv(&coordinateur, 0, int, 0, 0, parent, &etat); // pas sure pour le "parent"
 
     if(coordinateur > 0)
-    {
-        //TODO traitement
-        // Envoi temperature aux voisins
-        send_temperature_to_neighbours();
-
-        //Recevoir temperature des voisins
-        recv_temperature_from_neighbours();
-
-        //Calculer la nouvelle temperature
-        process_new_temperature();
-
-        //Envoi nouvelle temperature au coordinateur
-        send_new_temperature();
-        
-        
+    {   
+        traitement_temperatures();   
         //TODO Back to wait_for_int_from_coord()
     }
     else
