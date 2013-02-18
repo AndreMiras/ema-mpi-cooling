@@ -7,6 +7,8 @@ MKDIR_P = mkdir -p
 
 # all: directories program
 all: program
+	@echo "\nrun with:"
+	@echo "mpirun -np 1 master"
 
 directories: ${OUT_DIR}
 
@@ -15,7 +17,7 @@ ${OUT_DIR}:
 	${MKDIR_P} ${OUT_DIR}
 
 program: master calculator_slave coordinator_slave
-	# $(CC) $(LDFLAGS) -o $@ $^
+	@# $(CC) $(LDFLAGS) -o $@ $^
 	$(CC) $(LDFLAGS) -o master master.o utils.o
 	$(CC) $(LDFLAGS) -o calculator_slave calculator_slave.o utils.o
 	$(CC) $(LDFLAGS) -o coordinator_slave coordinator_slave.o utils.o
