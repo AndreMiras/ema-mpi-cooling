@@ -2,7 +2,6 @@
 #include "utils.h"
 #include <mpi.h>
 #include <stdio.h>
-#include <vector>
 
 #define ARRAY_MAX_SIZE		16
 #define NO_NEIGHBOUR_VALUE	-1
@@ -10,8 +9,6 @@
 #define SOUTH			 1
 #define EAST			 1
 #define WEST			-1
-
-using namespace std;
 
 /*
  * Given a matrix and a row, col couple, returns the north neighbour
@@ -298,10 +295,30 @@ void init_neighbours_array(int neighbours_array[], int neighbours_array_size)
 	}
 }
 
-void init_matrix(vector<vector<int> >& matrix, const int matrix_row_size, const int matrix_col_size)
+void init_temperature_matrix(vector<vector<float> >& matrix, const int matrix_row_size, const int matrix_col_size)
+{
+	vector<float> array;
+	int calculator_num = calculator_slave_id;
+	float temperature;
+
+	for (int row=0; row < matrix_row_size; row++)
+	{
+		array.clear();
+		for (int col=0; col < matrix_row_size; col++)
+		{
+            temperature = get_initial_temperature(calculator_num);
+			array.push_back(temperature);
+			calculator_num++;
+		}
+		matrix.push_back(array);
+	}
+}
+
+void init_processes_matrix(vector<vector<int> >& matrix, const int matrix_row_size, const int matrix_col_size)
 {
 	vector<int> array;
-	int calculator_num = 0;
+	int calculator_num = 1;
+
 	for (int row=0; row < matrix_row_size; row++)
 	{
 		array.clear();
@@ -312,17 +329,49 @@ void init_matrix(vector<vector<int> >& matrix, const int matrix_row_size, const 
 		}
 		matrix.push_back(array);
 	}
-
 }
 
 /*
  * Phase 3: un float correspondant à la temperature initiale du carré (fixée en dur, puis lue dans un fichier de config)
- * TODO: get from config file
+ * TODO: donner une temperature aléatoire
  */
-float get_initial_temperature()
+float get_initial_temperature(int process)
 {
-	float initial_temperature = 10.0; // TODO: get from config file
+	float initial_temperature;
+    // pour le moment on donne une temperature determinée pour les tests
+    // mais ça devra être aléatoire pour la suite
+    if (process == 1)
+    {
+        initial_temperature = 50.0;
+    }
+    else
+    {
+        initial_temperature = 20.0;
+    }
+
 	return initial_temperature;
+}
+
+float get_temperature(int calculator_number)
+{
+    int row;
+    int col;
+    float temperature;
+
+    get_calculator_row_col(
+        calculator_number,
+        processes_matrix,
+        processes_matrix.size(),
+        processes_matrix.at(0).size(),
+        row,
+        col);
+    temperature = temperature_matrix.at(row).at(col);
+    cout << "calculator_number: " << calculator_number << endl;
+    cout << "row: " << row << endl;
+    cout << "col: " << col << endl;
+    cout << "temperature: " << temperature << endl << endl;
+
+    return temperature;
 }
 
 void send_init_phase_ended_message(MPI_Comm intercomm)
@@ -408,17 +457,19 @@ int main(int argc, char *argv[])
 	const int matrix_col_size = 3;
 
 	int calculator_num = 0;
-	vector<vector<int> > matrix;
-	init_matrix(matrix, matrix_row_size, matrix_col_size);
-	cout << "matrix[" << matrix.size() << "][" << matrix[0].size() << "] = ";
-	display_matrix(matrix);
+	init_temperature_matrix(temperature_matrix, matrix_row_size, matrix_col_size);
+	init_processes_matrix(processes_matrix, matrix_row_size, matrix_col_size);
+	cout << "processes_matrix[" << processes_matrix.size() << "][" << processes_matrix[0].size() << "] = ";
+	display_matrix<int>(processes_matrix);
+	cout << "temperature_matrix[" << temperature_matrix.size() << "][" << temperature_matrix[0].size() << "] = ";
+	display_matrix<float>(temperature_matrix);
 	int calculator_row, calculator_col;
 	// on ne communique qu'avec les calculateurs (le coordinateur a l'id 0)
 	for (int dest=calculator_slave_id; dest<=calculator_slave_count; dest++)
 	{
-		get_calculator_row_col(dest, matrix, matrix_row_size, matrix_col_size, calculator_row, calculator_col);
+		get_calculator_row_col(dest, processes_matrix, matrix_row_size, matrix_col_size, calculator_row, calculator_col);
 		get_neighbours_array_from_matrix(
-				matrix,
+				processes_matrix,
 				matrix_row_size,
 				matrix_col_size,
 				calculator_row,
@@ -453,7 +504,7 @@ int main(int argc, char *argv[])
 		// Sets neighbours_array and initial_temperature
 		calculator_init calculator_init1;
 		memcpy(calculator_init1.neighbours_array, neighbours_array, neighbours_array_size * sizeof(int));
-		calculator_init1.initial_temperature = get_initial_temperature();
+		calculator_init1.initial_temperature = get_temperature(dest);
 		printf("calculator_init1.initial_temperature = %f\n", calculator_init1.initial_temperature);
 
 		// Sends neighbours_array and initial_temperature
