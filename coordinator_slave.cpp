@@ -71,6 +71,7 @@ void send_step_number_to_all_calculators()
     cout << "send_step_number_to_all_calculators" << endl;
     int step_number = 0; // TODO: hardcoded
     const int calculators_count = 9; // FIXME: hardcoded
+
     for(int id=calculator_slave_id; id<calculators_count; id++)
     {
 		MPI_Send(&step_number, 1, MPI_INT, id, 0, MPI_COMM_WORLD);
