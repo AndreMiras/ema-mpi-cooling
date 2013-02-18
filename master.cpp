@@ -356,8 +356,8 @@ int main(int argc, char *argv[])
 	MPI_Status status;
 
 	char *cmds[nb_instances] = {
-		"coordinator_slave",
-		"calculator_slave"
+		(char*)"coordinator_slave",
+		(char*)"calculator_slave"
 	};
 
 	int np[nb_instances] = {
