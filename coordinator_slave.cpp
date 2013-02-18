@@ -1,8 +1,8 @@
 #include "coordinator_slave.h"
 #include "utils.h"
-#include <vector>
-#include <mpi.h>
 #include <stdio.h>
+#include <stdlib.h>
+#include <vector>
 #include <iostream>
 
 using namespace std;
@@ -26,14 +26,22 @@ void wait_init_phase_ended_message()
     }
 }
 
+/**
+ * sends SIMULATION_PHASE_ENDED message to master and calculators
+ */
 void send_simulation_phase_ended_message()
 {
     MPI_Comm parent;
     MPI_Comm_get_parent(&parent);
-
     int message = SIMULATION_PHASE_ENDED;
+
     cout << "send_simulation_phase_ended_message: SIMULATION_PHASE_ENDED: " << SIMULATION_PHASE_ENDED << endl;
+
+    // sends to master
     MPI_Send(&message, 1, MPI_INT, 0, 0, parent);
+
+    // sends to calculators
+    // send_message_to_calculators(&message, 1, MPI_INT); // TODO: test and put back in
 }
 
 
@@ -62,31 +70,39 @@ void recv_from_all_calc() {
 }
 
 
-void receive_all_new_temperatures()
+vector<float> receive_all_new_temperatures()
 {
+    vector<float> temperatures_array;
+
+    // TODO: receive temperatures MPI_Recv
+
+    return temperatures_array;
 }
 
-void send_step_number_to_all_calculators()
+float compute_mean_temperature(vector<float> temperatures_array)
 {
-    cout << "send_step_number_to_all_calculators" << endl;
-    int step_number = 0; // TODO: hardcoded
-    const int calculators_count = 9; // FIXME: hardcoded
+    float mean_temperature;
+    int temperatures_array_size = temperatures_array.size();
 
+    for(int i=0; i < temperatures_array_size; i++)
+    {
+        mean_temperature += temperatures_array.at(i);
+    }
+    mean_temperature = mean_temperature / temperatures_array_size;
+
+    return mean_temperature;
+}
+
+
+// TODO: perhaps we could use MPI_Bcast
+void send_message_to_calculators(void* buffer, int count, MPI_Datatype datatype)
+{
+    int calculators_count = 9; // TODO: hardcoded
     for(int id=calculator_slave_id; id<calculators_count; id++)
     {
-		MPI_Send(&step_number, 1, MPI_INT, id, 0, MPI_COMM_WORLD);
+		// MPI_Send(&step_number, 1, MPI_INT, id, 0, MPI_COMM_WORLD);
+		MPI_Send(buffer, count, datatype, id, 0, MPI_COMM_WORLD);
     }
-}
-
-void send_end_message_to_calculators()
-{
-}
-
-float compute_delta_temperature()
-{
-    float delta = 0.0;
-
-    return delta;
 }
 
 /*
@@ -97,20 +113,27 @@ float compute_delta_temperature()
  * “Delta Tmoy” = “Tmoy_courant” - “Tmoy_new”
  * si “Delta Tmoy” >= Epsilon on recommence, sinon on envoie un message de fin aux calculateurs
  */
-void step4() // TODO: give relevant name
+void start_simulation(int simulation_step) // TODO: give relevant name
 {
-    send_step_number_to_all_calculators();
-    receive_all_new_temperatures();
-    float delta_temperature = compute_delta_temperature();
-    epsilon = 0.0; // TODO: overridded for debugging purpose
+    // recv_from_all_calc(); // TODO
+
+    // sends simulation step to calculators
+    send_message_to_calculators(&simulation_step, 1, MPI_INT);
+
+    // receive all calculators temperature and computes the mean temperature
+    vector<float> temperatures_array = receive_all_new_temperatures();
+    float mean_temperature = compute_mean_temperature(temperatures_array);
+
+    float current_temperature = 20.0; // TODO: hardcoded
+    float delta_temperature = abs(mean_temperature - current_temperature);
     if (delta_temperature > epsilon)
     {
-        // step4(); // TODO: commented out for debugging purpose
+        simulation_step++; // TODO: before or after
+        // start_simulation(simulation_step); // TODO: commented out for debugging purpose
     }
-    send_end_message_to_calculators();
 }
 
-int main( int argc, char *argv[] )
+int main(int argc, char *argv[])
 {
 	string prog_name(argv[0]);
 	int myrank;
@@ -129,13 +152,13 @@ int main( int argc, char *argv[] )
 		printf("Child %d : %s : No parent!\n", myrank, prog_name.c_str());
 	}
 	else {
-		// TODO: should actually be the other way around
 		// the master sends the coordinator the init phase ended so the coordinator can start its work
         wait_init_phase_ended_message();
 
-        recv_from_all_calc();
+        // recv_from_all_calc(); // TODO
 
-        // TODO: simulation code here
+        // "toc" de simulation
+        // start_simulation(0); // TODO: test and put back in
 
         send_simulation_phase_ended_message();
 	}
