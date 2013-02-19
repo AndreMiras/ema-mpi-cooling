@@ -3,7 +3,6 @@
 #include <mpi.h>
 #include <stdio.h>
 
-#define ARRAY_MAX_SIZE		16
 #define NO_NEIGHBOUR_VALUE	-1
 #define NORTH			-1
 #define SOUTH			 1
@@ -317,7 +316,7 @@ void init_temperature_matrix(vector<vector<float> >& matrix, const int matrix_ro
 void init_processes_matrix(vector<vector<int> >& matrix, const int matrix_row_size, const int matrix_col_size)
 {
 	vector<int> array;
-	int calculator_num = 1;
+	int calculator_num = calculator_slave_id;
 
 	for (int row=0; row < matrix_row_size; row++)
 	{
@@ -387,7 +386,7 @@ void wait_simulation_phase_ended_message(MPI_Comm intercomm)
 	MPI_Recv(&message, 1, MPI_INT, coordinator_slave_id, tag, intercomm, &status);
 	if (message == SIMULATION_PHASE_ENDED)
 	{  
-		cout << "wait_simulation_phase_ended_message: SIMULATION_PHASE_ENDED" << endl;
+		cout << "wait_simulation_phase_ended_message: SIMULATION_PHASE_ENDED: " << SIMULATION_PHASE_ENDED << endl;
 	}
 	else
 	{  
@@ -417,12 +416,12 @@ int main(int argc, char *argv[])
 
 	MPI_Info infos[nb_instances] = { MPI_INFO_NULL, MPI_INFO_NULL };
 
-	int errcodes[5]; // Les codes de retours des 5 processus
+	int errcodes[coordinator_slave_count + calculator_slave_count]; // Les codes de retours des processus
 	MPI_Comm intercomm; // L'espace de communication père - fils
 
 	MPI_Init(&argc, &argv);
 
-	// On lance simultanément 2 instances de prg1 et 3 de prg2
+	// On lance simultanément x instances de prg1 et y instances de prg2
 
 	MPI_Comm_spawn_multiple(
 		// le nombre de programme (la taille des tableaux passés en paramètre).
@@ -451,10 +450,7 @@ int main(int argc, char *argv[])
 
 	const int neighbours_array_size = NB_NEIGHBOURS;
 	int neighbours_array[neighbours_array_size]; // neighbours array to be sent
-	const int matrix_row_size = 3;
-	const int matrix_col_size = 3;
 
-	int calculator_num = 0;
 	init_temperature_matrix(temperature_matrix, matrix_row_size, matrix_col_size);
 	init_processes_matrix(processes_matrix, matrix_row_size, matrix_col_size);
 	cout << "processes_matrix[" << processes_matrix.size() << "][" << processes_matrix[0].size() << "] = ";
@@ -487,31 +483,28 @@ int main(int argc, char *argv[])
 		calculator_init1.initial_temperature = get_temperature(dest);
 		printf("calculator_init1.initial_temperature = %f\n", calculator_init1.initial_temperature);
 
-		// Sends neighbours_array and initial_temperature
-		MPI_Send(&calculator_init1, 1, mpi_calculator_init_type, dest, tag, intercomm);
-		/*
-		MPI_Send(
-			// buffer représente l’adresse en mémoire du tableau de données à envoyer
-			&neighbours_array,
-			// nombreDeDonnees correspond à la taille de ce tableau
-			neighbours_array_size,
-			// typeDeDonnee permet de « typer » les données qui sont
-			// envoyées vers le destinataire. Les valeurs possibles pour
-			// ce paramètre sont présentées un peu plus loin.
-			MPI_INT,
-			// destination est le numéro du processus (ou processeur)
-			// destination dans l’espace de communication considéré.
-			dest,
-			// tag est un entier qui permet de différencier plusieurs
-			// messages à destination d’un même processus (nous
-			// pouvons le considérer comme un numéro de canal).
-			tag,
-			// permet de spécifier l’ensemble des
-			// processus (ou processeurs) concernés par cette
-			// communication. Si tous les nœuds sont concernés alors
-			// espaceDeComm vaut MPI_COMM_WORLD.
-			intercomm);
-		*/
+        // Sends neighbours_array and initial_temperature
+        MPI_Send(
+                // buffer représente l’adresse en mémoire du tableau de données à envoyer
+                &calculator_init1,
+                // nombreDeDonnees correspond à la taille de ce tableau
+                1,
+                // typeDeDonnee permet de « typer » les données qui sont
+                // envoyées vers le destinataire. Les valeurs possibles pour
+                // ce paramètre sont présentées un peu plus loin.
+                mpi_calculator_init_type,
+                // destination est le numéro du processus (ou processeur)
+                // destination dans l’espace de communication considéré.
+                dest,
+                // tag est un entier qui permet de différencier plusieurs
+                // messages à destination d’un même processus (nous
+                // pouvons le considérer comme un numéro de canal).
+                tag,
+                // permet de spécifier l’ensemble des
+                // processus (ou processeurs) concernés par cette
+                // communication. Si tous les nœuds sont concernés alors
+                // espaceDeComm vaut MPI_COMM_WORLD.
+                intercomm);
 		printf("Parent: Sending to %d.\n", dest);
 
 		// MPI_Recv(&compteur, 1, MPI_INT, dest, 0, intercomm, &status);
