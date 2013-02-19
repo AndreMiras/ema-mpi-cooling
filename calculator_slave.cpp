@@ -107,7 +107,6 @@ void send_new_temperature(double new_temperature)
 }
 
 
-
 void traitement_temperatures()
 {
     // Envoi temperature aux voisins
@@ -167,10 +166,7 @@ void send_end_message()
             }
         }
     }
-
 }
-
-
 
 
 int main(int argc, char *argv[])
@@ -186,27 +182,21 @@ int main(int argc, char *argv[])
 	MPI_Comm_get_parent(&parent);
 	MPI_Comm_rank(MPI_COMM_WORLD, &myrank);
 
-	if (parent == MPI_COMM_NULL)
+    mpi_debug(prog_name, myrank, parent, "Calculator created");
+	if (parent != MPI_COMM_NULL)
 	{
-		printf("Child %d : %s : No parent!\n", myrank, prog_name.c_str());
-	}
-	else {
 		// MPI_Recv(&compteur, 1, MPI_INT, 0, 0, parent, &status);
 		// TODO: check we can get the actual received size from the status
 		// MPI_Recv(neighbours_array, neighbours_array_size, MPI_INT, 0, 0, parent, &status);
 
-                receive_init_struct();
+        receive_init_struct();
 
 		// MPI_Send(&compteur, 1, MPI_INT, 0, 0, parent);
 		// printf("Child %d : %s : Sending to parent!\n", myrank, prog_name.c_str());
 	}
         
-        send_end_message();
+    send_end_message();
 
 	MPI_Finalize();
 	return 0;
 }
-
-
-
-

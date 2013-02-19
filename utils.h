@@ -1,4 +1,7 @@
 #include <vector>
+#include <string>
+#include <sstream>
+#include <iostream>
 #include <mpi.h>
 
 using namespace std;
@@ -66,4 +69,16 @@ void display_matrix(const vector<vector<T> > matrix)
 		display_array<T>(matrix[row].data(), matrix[row].size());
 	}
 	cout << "}" << endl;
+}
+void mpi_debug(const string& prog_name, const int& rank, const MPI_Comm& parent, const string& message="No message");
+
+template<class T>
+std::string t_to_string(T i)
+{
+    std::stringstream ss;
+    std::string s;
+    ss << i;
+    s = ss.str();
+
+    return s;
 }

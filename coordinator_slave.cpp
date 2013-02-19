@@ -146,12 +146,9 @@ int main(int argc, char *argv[])
 	MPI_Comm_get_parent(&parent);
 	MPI_Comm_rank(MPI_COMM_WORLD, &myrank);
 
-	cout << "Coordinator created and running" << endl;
-	if (parent == MPI_COMM_NULL)
+	mpi_debug(prog_name, myrank, parent, "Coordinator created");
+	if (parent != MPI_COMM_NULL)
 	{
-		printf("Child %d : %s : No parent!\n", myrank, prog_name.c_str());
-	}
-	else {
 		// the master sends the coordinator the init phase ended so the coordinator can start its work
         wait_init_phase_ended_message();
 

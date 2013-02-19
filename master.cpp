@@ -406,7 +406,7 @@ MPI_Comm create_coordinator_slave_and_calculators_slaves()
 
 	int np[nb_instances] = {
 		coordinator_slave_count,	// On lance x instances du programme 1
-		calculator_slave_count		// On lance x instances du programme 2
+		calculator_slave_count		// On lance y instances du programme 2
 	};
 
 	// Pas d'info supplémentaires pour contrôler le lancement
