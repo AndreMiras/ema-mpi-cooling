@@ -29,13 +29,12 @@ void mpi_debug(const string& prog_name, const int& rank, const MPI_Comm& parent,
     if (parent == MPI_COMM_NULL)
     {
         parent_str = "MPI_COMM_NULL";
-        // cout << "prog_name:  " << prog_name.c_str() << ", rank: " << myrank << ", parent: MPI_COMM_NULL" << endl;
     }
     else {
         parent_str = t_to_string(parent);
     }
-    cout << "prog_name:  " << prog_name.c_str() <<
+    cout << "prog_name: " << prog_name.c_str() <<
             ", rank: " << rank <<
-            ", parent: " << parent_str <<
+            // ", parent: " << parent_str <<
             ", message: " << message << endl;
 }

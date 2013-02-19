@@ -373,31 +373,50 @@ float get_temperature(int calculator_number)
 
 void send_init_phase_ended_message(const MPI_Comm& intercomm)
 {
-    int message = INIT_PHASE_ENDED;
-    cout << "send_init_phase_ended_message: INIT_PHASE_ENDED: " << INIT_PHASE_ENDED << endl;
-    MPI_Send(&message, 1, MPI_INT, coordinator_slave_id, tag, intercomm);
+    int code = INIT_PHASE_ENDED;
+    int myrank;
+    MPI_Comm parent;
+    MPI_Comm_get_parent(&parent);
+    MPI_Comm_rank(MPI_COMM_WORLD, &myrank);
+
+    string code_str = t_to_string(INIT_PHASE_ENDED);
+    string message = "send_init_phase_ended_message: INIT_PHASE_ENDED: " + code_str;
+    mpi_debug(prog_name, myrank, parent, message);
+    MPI_Send(&code, 1, MPI_INT, coordinator_slave_id, tag, intercomm);
 }
 
 void wait_simulation_phase_ended_message(const MPI_Comm& intercomm)
 {
-	int message;
+	int code;
 	MPI_Status status;
+    int myrank;
+    MPI_Comm parent;
+    MPI_Comm_get_parent(&parent);
+    MPI_Comm_rank(MPI_COMM_WORLD, &myrank);
+    string message;
 
-	MPI_Recv(&message, 1, MPI_INT, coordinator_slave_id, tag, intercomm, &status);
-	if (message == SIMULATION_PHASE_ENDED)
+	MPI_Recv(&code, 1, MPI_INT, coordinator_slave_id, tag, intercomm, &status);
+    string code_str = t_to_string(code);
+	if (code == SIMULATION_PHASE_ENDED)
 	{  
-		cout << "wait_simulation_phase_ended_message: SIMULATION_PHASE_ENDED: " << SIMULATION_PHASE_ENDED << endl;
+        message = "wait_simulation_phase_ended_message: SIMULATION_PHASE_ENDED: ";
 	}
 	else
 	{  
-		cout << "wait_simulation_phase_ended_message: Unexpected message: " << message << endl;
+        message = "wait_simulation_phase_ended_message: Unexpected code: ";
 	}
+    message += code_str;
+    mpi_debug(prog_name, myrank, parent, message);
 }
 
 MPI_Comm create_coordinator_slave_and_calculators_slaves()
 {
 	MPI_Status status;
 	MPI_Comm intercomm; // L'espace de communication père - fils
+    int myrank;
+    MPI_Comm parent;
+    MPI_Comm_get_parent(&parent);
+    MPI_Comm_rank(MPI_COMM_WORLD, &myrank);
 
 	char *cmds[nb_instances] = {
 		(char*)"coordinator_slave",
@@ -438,7 +457,7 @@ MPI_Comm create_coordinator_slave_and_calculators_slaves()
 		errcodes
 	);
 
-	printf("Parent: I ran all instances.\n");
+    mpi_debug(prog_name, myrank, parent, "Parent: I ran all instances.");
 	// Le père communique de façon synchrone avec chacun de
 	// ses fils en utilisant l'espace de communication intercomm
 
@@ -447,6 +466,11 @@ MPI_Comm create_coordinator_slave_and_calculators_slaves()
 
 void neighbour_array_creation_and_passing(const MPI_Comm& intercomm)
 {
+    int myrank;
+    MPI_Comm parent;
+    MPI_Comm_get_parent(&parent);
+    MPI_Comm_rank(MPI_COMM_WORLD, &myrank);
+
 	const int neighbours_array_size = NB_NEIGHBOURS;
 	int neighbours_array[neighbours_array_size]; // neighbours array to be sent
 
@@ -480,7 +504,9 @@ void neighbour_array_creation_and_passing(const MPI_Comm& intercomm)
 		calculator_init calculator_init1;
 		memcpy(calculator_init1.neighbours_array, neighbours_array, neighbours_array_size * sizeof(int));
 		calculator_init1.initial_temperature = get_temperature(dest);
-		printf("calculator_init1.initial_temperature = %f\n", calculator_init1.initial_temperature);
+        string temperature_str = t_to_string(calculator_init1.initial_temperature);
+        string message = "calculator_init1.initial_temperature2 = " + temperature_str;
+        mpi_debug(prog_name, myrank, parent, message);
 
         // Sends neighbours_array and initial_temperature
         MPI_Send(
@@ -512,6 +538,7 @@ int main(int argc, char *argv[])
 {
 	MPI_Comm intercomm; // L'espace de communication père - fils
 	MPI_Init(&argc, &argv);
+    prog_name = argv[0];
 
     // 1 Slaves plus coordinator creation
     intercomm = create_coordinator_slave_and_calculators_slaves();
@@ -527,6 +554,7 @@ int main(int argc, char *argv[])
 
 	printf ("Pere : Fin.\n");
 
+    // TODO: don't we do a MPI_Comm_free?
 	MPI_Finalize();
 	return 0;
 }

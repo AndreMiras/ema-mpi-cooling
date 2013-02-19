@@ -1,7 +1,10 @@
 #include <vector>
+#include <iostream>
+
 using namespace std;
 
 const int tag = 0;
+string prog_name;
 
 vector<vector<float> > temperature_matrix;
 vector<vector<int> > processes_matrix;
