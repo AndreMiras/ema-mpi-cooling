@@ -371,14 +371,14 @@ float get_temperature(int calculator_number)
 }
 
 
-void send_init_phase_ended_message(MPI_Comm intercomm)
+void send_init_phase_ended_message(const MPI_Comm& intercomm)
 {
     int message = INIT_PHASE_ENDED;
     cout << "send_init_phase_ended_message: INIT_PHASE_ENDED: " << INIT_PHASE_ENDED << endl;
     MPI_Send(&message, 1, MPI_INT, coordinator_slave_id, tag, intercomm);
 }
 
-void wait_simulation_phase_ended_message(MPI_Comm intercomm)
+void wait_simulation_phase_ended_message(const MPI_Comm& intercomm)
 {
 	int message;
 	MPI_Status status;
@@ -394,12 +394,10 @@ void wait_simulation_phase_ended_message(MPI_Comm intercomm)
 	}
 }
 
-int main(int argc, char *argv[])
+MPI_Comm create_coordinator_slave_and_calculators_slaves()
 {
-	const int coordinator_slave_count = 1;
-	const int calculator_slave_count = 4;
-	const int nb_instances = 2;
 	MPI_Status status;
+	MPI_Comm intercomm; // L'espace de communication père - fils
 
 	char *cmds[nb_instances] = {
 		(char*)"coordinator_slave",
@@ -417,12 +415,8 @@ int main(int argc, char *argv[])
 	MPI_Info infos[nb_instances] = { MPI_INFO_NULL, MPI_INFO_NULL };
 
 	int errcodes[coordinator_slave_count + calculator_slave_count]; // Les codes de retours des processus
-	MPI_Comm intercomm; // L'espace de communication père - fils
-
-	MPI_Init(&argc, &argv);
 
 	// On lance simultanément x instances de prg1 et y instances de prg2
-
 	MPI_Comm_spawn_multiple(
 		// le nombre de programme (la taille des tableaux passés en paramètre).
 		nb_instances,
@@ -448,6 +442,11 @@ int main(int argc, char *argv[])
 	// Le père communique de façon synchrone avec chacun de
 	// ses fils en utilisant l'espace de communication intercomm
 
+    return intercomm;
+}
+
+void neighbour_array_creation_and_passing(const MPI_Comm& intercomm)
+{
 	const int neighbours_array_size = NB_NEIGHBOURS;
 	int neighbours_array[neighbours_array_size]; // neighbours array to be sent
 
@@ -506,11 +505,20 @@ int main(int argc, char *argv[])
                 // espaceDeComm vaut MPI_COMM_WORLD.
                 intercomm);
 		printf("Parent: Sending to %d.\n", dest);
-
-		// MPI_Recv(&compteur, 1, MPI_INT, dest, 0, intercomm, &status);
-		// printf("Parent: Receiving from %d.\n", dest);
-
 	}
+}
+
+int main(int argc, char *argv[])
+{
+	MPI_Comm intercomm; // L'espace de communication père - fils
+	MPI_Init(&argc, &argv);
+
+    // 1 Slaves plus coordinator creation
+    intercomm = create_coordinator_slave_and_calculators_slaves();
+
+    // 2 Neighbour array and temperature creation and passing to childs
+    neighbour_array_creation_and_passing(intercomm);
+
 	// 3 fin de la phase d'initialisation
 	send_init_phase_ended_message(intercomm);
 

@@ -6,6 +6,12 @@ using namespace std;
 const int coordinator_slave_id = 0; // l'id du coordinateur
 const int calculator_slave_id = 1; // les id esclaves demarrent a 1
 
+// number of coordinator process
+const int coordinator_slave_count = 1;
+// number of calculator processes
+const int calculator_slave_count = 4;
+const int nb_instances = 2;
+
 // Matrix plate dimension
 const int matrix_row_size = 3;
 const int matrix_col_size = 3;
