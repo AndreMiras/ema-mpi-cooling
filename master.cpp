@@ -303,7 +303,7 @@ void init_temperature_matrix(vector<vector<float> >& matrix, const int matrix_ro
 	for (int row=0; row < matrix_row_size; row++)
 	{
 		array.clear();
-		for (int col=0; col < matrix_row_size; col++)
+		for (int col=0; col < matrix_col_size; col++)
 		{
             temperature = get_initial_temperature(calculator_num);
 			array.push_back(temperature);
@@ -321,7 +321,7 @@ void init_processes_matrix(vector<vector<int> >& matrix, const int matrix_row_si
 	for (int row=0; row < matrix_row_size; row++)
 	{
 		array.clear();
-		for (int col=0; col < matrix_row_size; col++)
+		for (int col=0; col < matrix_col_size; col++)
 		{
 			array.push_back(calculator_num);
 			calculator_num++;

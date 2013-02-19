@@ -11,7 +11,7 @@ const int calculator_slave_id = 1; // les id esclaves demarrent a 1
 
 // Matrix plate dimension
 const int matrix_row_size = 3;
-const int matrix_col_size = 3;
+const int matrix_col_size = 4;
 
 // number of coordinator process
 const int coordinator_slave_count = 1;
