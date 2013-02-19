@@ -1,4 +1,9 @@
+#include <iostream>
 #include <mpi.h>
+
+using namespace std;
+
+string prog_name;
 
 const float epsilon = 0.5;
 

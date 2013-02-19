@@ -72,9 +72,27 @@ void recv_from_all_calc() {
 
 vector<float> receive_all_new_temperatures()
 {
+	int myrank;
+	float temperature;
+	MPI_Comm parent;
+	MPI_Status status;
     vector<float> temperatures_array;
 
+	MPI_Comm_get_parent(&parent);
+	MPI_Comm_rank(MPI_COMM_WORLD, &myrank);
+
+    mpi_debug(prog_name, myrank, parent, "receive_all_new_temperatures");
+    // TODO: perhaps we could use MPI_Gather
     // TODO: receive temperatures MPI_Recv
+    for(int calculator_id=1; calculator_id < calculator_slave_count; calculator_id++)
+    {
+        MPI_Recv(&temperature, 1, MPI_FLOAT, 0, 0, MPI_COMM_WORLD, &status);
+        temperatures_array.push_back(temperature);
+        string temperature_str = t_to_string(temperature);
+        string message = "Received one temperature: " + temperature_str;
+        mpi_debug(prog_name, myrank, parent, message);
+    }
+    display_array(temperatures_array);
 
     return temperatures_array;
 }
@@ -95,7 +113,7 @@ float compute_mean_temperature(vector<float> temperatures_array)
 
 
 // TODO: perhaps we could use MPI_Bcast
-void send_message_to_calculators(void* buffer, int count, MPI_Datatype datatype)
+void send_message_to_calculators(void* buffer, const int count, const MPI_Datatype datatype)
 {
     int calculators_count = 9; // TODO: hardcoded
     for(int id=calculator_slave_id; id<calculators_count; id++)
@@ -126,16 +144,21 @@ void start_simulation(int simulation_step) // TODO: give relevant name
 
     float current_temperature = 20.0; // TODO: hardcoded
     float delta_temperature = abs(mean_temperature - current_temperature);
+    delta_temperature = 0; // TODO: for debugging purpose
     if (delta_temperature > epsilon)
     {
         simulation_step++; // TODO: before or after
         // start_simulation(simulation_step); // TODO: commented out for debugging purpose
     }
+    else
+    {
+        // mpi_debug(prog_name, myrank, parent, "delta_temperature > epsilon");
+    }
 }
 
 int main(int argc, char *argv[])
 {
-	string prog_name(argv[0]);
+	prog_name = argv[0];
 	int myrank;
 	int message;
 	MPI_Comm parent;
@@ -155,7 +178,7 @@ int main(int argc, char *argv[])
         // recv_from_all_calc(); // TODO
 
         // "toc" de simulation
-        // start_simulation(0); // TODO: test and put back in
+        start_simulation(0);
 
         send_simulation_phase_ended_message();
 	}

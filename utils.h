@@ -39,7 +39,7 @@ const int INIT_PHASE_ENDED = 0;
 
 void create_mpi_calculator_init_type(MPI_Datatype& mpi_calculator_init_type);
 
-void display_matrix(const vector<vector<int> > matrix);
+// void display_matrix(const vector<vector<int> > matrix);
 
 template <class T>
 void display_array(const T array[], const int array_size)
@@ -56,6 +56,12 @@ void display_array(const T array[], const int array_size)
 		}
 	}
 	cout << " }" << endl;
+}
+
+template <class T>
+void display_array(const vector<T> array)
+{
+    display_array(array.data(), array.size());
 }
 
 
