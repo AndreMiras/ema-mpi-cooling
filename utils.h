@@ -9,7 +9,7 @@
 using namespace std;
 
 static const int coordinator_slave_id = 0; // l'id du coordinateur
-static const int calculator_slave_id = 1; // les id esclaves demarrent a 1
+static const int calculator_slave_first_id = 1; // les id esclaves demarrent a 1
 
 // Matrix plate dimension
 static const int matrix_row_size = 3;
@@ -19,6 +19,7 @@ static const int matrix_col_size = 4;
 static const int coordinator_slave_count = 1;
 // number of calculator processes
 static const int calculator_slave_count = matrix_row_size * matrix_col_size;
+static const int calculator_slave_last_id = calculator_slave_first_id + calculator_slave_count -1;
 static const int nb_instances = 2;
 
 static const float current_temperature = 20.0;

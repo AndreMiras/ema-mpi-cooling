@@ -81,7 +81,6 @@ void send_temperature_to_neighbours()
     string message = "send_temperature_to_neighbours: " + t_to_string(my_temperature);
     mpi_debug(prog_name, myrank, parent, message);
     send_asynchronous_message_to_neighbours<float>(my_temperature, 1, MPI_FLOAT);
-    mpi_debug(prog_name, myrank, parent, "send_temperature_to_neighbours end");
 }
 
 // Recevoir temperature des voisins

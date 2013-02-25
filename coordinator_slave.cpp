@@ -15,11 +15,7 @@ void wait_init_phase_ended_message()
     int message;
     MPI_Status status;
 
-    mpi_debug(prog_name, myrank, parent, "wait_init_phase_ended_message begin");
-
-    mpi_debug(prog_name, myrank, parent, "wait_init_phase_ended_message MPI_Recv begin");
     MPI_Recv(&message, 1, MPI_INT, 0, 0, parent, &status);
-    mpi_debug(prog_name, myrank, parent, "wait_init_phase_ended_message MPI_Recv end");
 
     if (message == INIT_PHASE_ENDED)
     {
@@ -29,7 +25,6 @@ void wait_init_phase_ended_message()
     {
         cout << "wait_init_phase_ended_message: Unexpected message: " << message << endl;
     }
-    mpi_debug(prog_name, myrank, parent, "wait_init_phase_ended_message end");
 }
 
 /**
@@ -75,22 +70,22 @@ void recv_from_all_calc() {
 
 vector<float> receive_all_new_temperatures()
 {
+    string message;
 	float temperature;
 	MPI_Status status;
     vector<float> temperatures_array;
 
     mpi_debug(prog_name, myrank, parent, "receive_all_new_temperatures");
     // TODO: perhaps we could use MPI_Gather
-    // TODO: receive temperatures MPI_Recv
-    for(int calculator_id=1; calculator_id < calculator_slave_count; calculator_id++)
+    for(int calculator_id = calculator_slave_first_id; calculator_id <= calculator_slave_last_id; calculator_id++)
     {
+        message = "receive_all_new_temperatures: Receiving one temperature from: " + t_to_string(calculator_id);
+        mpi_debug(prog_name, myrank, parent, message);
         mpi_debug(prog_name, myrank, parent, "MPI_Recv begin");
         MPI_Recv(&temperature, 1, MPI_FLOAT, calculator_id, 0, MPI_COMM_WORLD, &status);
-        mpi_debug(prog_name, myrank, parent, "MPI_Recv end");
-        temperatures_array.push_back(temperature);
-        string temperature_str = t_to_string(temperature);
-        string message = "Received one temperature: " + temperature_str;
+        message = "MPI_Recv end, Received one temperature from: " + t_to_string(calculator_id) + " end";
         mpi_debug(prog_name, myrank, parent, message);
+        temperatures_array.push_back(temperature);
     }
     mpi_debug(prog_name, myrank, parent, "receive_all_new_temperatures end");
     display_array(temperatures_array);
@@ -118,7 +113,7 @@ void send_message_to_calculators(void* buffer, const int count, const MPI_Dataty
 {
     mpi_debug(prog_name, myrank, parent, "send_message_to_calculators");
 
-    for(int id=calculator_slave_id; id<calculator_slave_count; id++)
+    for(int id = calculator_slave_first_id; id <= calculator_slave_last_id; id++)
     {
         MPI_Send(buffer, count, datatype, id, 0, MPI_COMM_WORLD);
     }

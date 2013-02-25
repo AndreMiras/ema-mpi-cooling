@@ -296,7 +296,7 @@ void init_neighbours_array(int neighbours_array[], int neighbours_array_size)
 void init_temperature_matrix(vector<vector<float> >& matrix, const int matrix_row_size, const int matrix_col_size)
 {
 	vector<float> array;
-	int calculator_num = calculator_slave_id;
+	int calculator_num = calculator_slave_first_id;
 	float temperature;
 
 	for (int row=0; row < matrix_row_size; row++)
@@ -315,7 +315,7 @@ void init_temperature_matrix(vector<vector<float> >& matrix, const int matrix_ro
 void init_processes_matrix(vector<vector<int> >& matrix, const int matrix_row_size, const int matrix_col_size)
 {
 	vector<int> array;
-	int calculator_num = calculator_slave_id;
+	int calculator_num = calculator_slave_first_id;
 
 	for (int row=0; row < matrix_row_size; row++)
 	{
@@ -481,7 +481,7 @@ void neighbour_array_creation_and_passing(const MPI_Comm& intercomm)
 	display_matrix<float>(temperature_matrix);
 	int calculator_row, calculator_col;
 	// on ne communique qu'avec les calculateurs (le coordinateur a l'id 0)
-	for (int dest=calculator_slave_id; dest<=calculator_slave_count; dest++)
+	for (int dest = calculator_slave_first_id; dest <= calculator_slave_last_id; dest++)
 	{
 		get_calculator_row_col(dest, processes_matrix, matrix_row_size, matrix_col_size, calculator_row, calculator_col);
 		get_neighbours_array_from_matrix(
@@ -531,7 +531,6 @@ void neighbour_array_creation_and_passing(const MPI_Comm& intercomm)
                 // communication. Si tous les nœuds sont concernés alors
                 // espaceDeComm vaut MPI_COMM_WORLD.
                 intercomm);
-		printf("Parent: Sending to %d.\n", dest);
 	}
 }
 

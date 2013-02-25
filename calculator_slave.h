@@ -77,9 +77,8 @@ template <class T>
 void send_asynchronous_message_to_neighbours(const T& buffer, const int count, const MPI_Datatype datatype)
 {
     int id;
-    T tempBuffer = buffer; // because MPI_Send only acccepts "void" and not "const void"
+    T tempBuffer = buffer; // MPI_Send only acccepts "void" but not "const void"
     MPI_Request request;
-    float temperature_for_tests = 30.0;
 
     for(int i=0; i<NB_NEIGHBOURS; i++)
     {
