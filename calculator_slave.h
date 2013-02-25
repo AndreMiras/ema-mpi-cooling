@@ -5,6 +5,9 @@
 using namespace std;
 
 string prog_name;
+int myrank;
+MPI_Comm parent;
+
 int neighbours_array[NB_NEIGHBOURS]; // neighbours array to be received
 float my_temperature; // calculator temperature
 
@@ -33,18 +36,24 @@ vector<T> receive_message_from_neighbours(const int count, const MPI_Datatype da
     T buffer;
     MPI_Status status;
     const int tag = 0; // TODO[DRY]: use global utils.h tag value
-    int id;
+    int neighbour_id;
 
     for(int i=0; i<NB_NEIGHBOURS; i++)
     {
-        id = neighbours_array[i];
-        if (id == NO_NEIGHBOUR_VALUE)
+        neighbour_id = neighbours_array[i];
+        cout << "!! neighbour_id: " << neighbour_id << endl;
+        cout << "neighbours_array[" << NB_NEIGHBOURS << "] = ";
+        display_array(neighbours_array, NB_NEIGHBOURS);
+        if (neighbour_id == NO_NEIGHBOUR_VALUE)
         {
             buffer = current_temperature;
         }
         else
         {
-            MPI_Recv(&buffer, count, datatype, id, tag, MPI_COMM_WORLD, &status);
+            string message = "receive_message_from_neighbours MPI_Recv, neighbour_id: " + t_to_string(neighbour_id) + " begin";
+            mpi_debug(prog_name, myrank, parent, message);
+            MPI_Recv(&buffer, count, datatype, neighbour_id, tag, MPI_COMM_WORLD, &status);
+            mpi_debug(prog_name, myrank, parent, "receive_message_from_neighbours MPI_Recv end");
         }
         buffers.push_back(buffer); // TODO: finish up usig generics
     }
@@ -63,6 +72,21 @@ void send_message_to_neighbours(const T& buffer, const int count, const MPI_Data
     {
         id = neighbours_array[i];
         MPI_Send(&tempBuffer, count, datatype, id, 0, MPI_COMM_WORLD);
+    }
+}
+
+
+template <class T>
+void send_asynchronous_message_to_neighbours(const T& buffer, const int count, const MPI_Datatype datatype)
+{
+    int id;
+    T tempBuffer = buffer; // because MPI_Send only acccepts "void" and not "const void"
+    MPI_Request request;
+
+    for(int i=0; i<NB_NEIGHBOURS; i++)
+    {
+        id = neighbours_array[i];
+        MPI_Isend(&tempBuffer, count, datatype, id, 0, MPI_COMM_WORLD, &request);
     }
 }
 

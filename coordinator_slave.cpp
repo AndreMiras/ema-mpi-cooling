@@ -96,7 +96,9 @@ vector<float> receive_all_new_temperatures()
     // TODO: receive temperatures MPI_Recv
     for(int calculator_id=1; calculator_id < calculator_slave_count; calculator_id++)
     {
+        mpi_debug(prog_name, myrank, parent, "MPI_Recv begin");
         MPI_Recv(&temperature, 1, MPI_FLOAT, 0, 0, MPI_COMM_WORLD, &status);
+        mpi_debug(prog_name, myrank, parent, "MPI_Recv end");
         temperatures_array.push_back(temperature);
         string temperature_str = t_to_string(temperature);
         string message = "Received one temperature: " + temperature_str;
@@ -147,11 +149,8 @@ void send_message_to_calculators(void* buffer, const int count, const MPI_Dataty
  */
 void start_simulation(int simulation_step) // TODO: give relevant name
 {
-    // recv_from_all_calc(); // TODO
     // sends simulation step to calculators
     send_message_to_calculators(&simulation_step, 1, MPI_INT);
-
-
 
     // receive all calculators temperature and computes the mean temperature
     vector<float> temperatures_array = receive_all_new_temperatures();
@@ -192,9 +191,8 @@ int main(int argc, char *argv[])
         // recv_from_all_calc(); // TODO
 
         // "toc" de simulation
-        start_simulation(0);
+        start_simulation(1);
         send_simulation_phase_ended_message();
-
     }
     else
     {

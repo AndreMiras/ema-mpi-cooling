@@ -51,17 +51,13 @@ void receive_init_struct()
 {
     const int src = 0;
     const int tag = 0;
-	int myrank;
-	MPI_Comm parent;
 	MPI_Status status;
-	MPI_Comm_get_parent(&parent);
 	MPI_Comm_rank(MPI_COMM_WORLD, &myrank);
 
     calculator_init recv;
     MPI_Datatype mpi_calculator_init_type;
 
     create_mpi_calculator_init_type(mpi_calculator_init_type);
-    // MPI_Recv(neighbours_array, neighbours_array_size, MPI_INT, 0, 0, parent, &status);
     MPI_Recv(&recv, 1, mpi_calculator_init_type, src, tag, parent, &status);
     my_temperature = recv.initial_temperature;
     printf("Rank %d: Received: my_temperature = %f\n", myrank, my_temperature);
@@ -71,8 +67,9 @@ void receive_init_struct()
     cout << "neighbours_array[" << NB_NEIGHBOURS << "] = ";
     display_array(recv.neighbours_array, NB_NEIGHBOURS);
     */
+    memcpy(neighbours_array, recv.neighbours_array, sizeof(int) * NB_NEIGHBOURS);
     vector<vector<int> > matrix;
-    create_matrix_from_neighbours_array(recv.neighbours_array, NB_NEIGHBOURS, myrank, matrix);
+    create_matrix_from_neighbours_array(neighbours_array, NB_NEIGHBOURS, myrank, matrix);
     /*
     cout << "neighbours_matrix[" << matrix.size() << "][" << matrix[0].size() << "] = ";
     display_matrix<int>(matrix);
@@ -80,10 +77,14 @@ void receive_init_struct()
     cout << endl;
 }
 
+// TODO: sould be async!
 // Envoi temperature aux voisins
 void send_temperature_to_neighbours()
 {
-    send_message_to_neighbours<float>(my_temperature, 1, MPI_FLOAT);
+    string message = "send_temperature_to_neighbours: " + t_to_string(my_temperature);
+    mpi_debug(prog_name, myrank, parent, message);
+    send_asynchronous_message_to_neighbours<float>(my_temperature, 1, MPI_FLOAT);
+    mpi_debug(prog_name, myrank, parent, "send_temperature_to_neighbours end");
 }
 
 // Recevoir temperature des voisins
@@ -91,7 +92,9 @@ vector<float> receive_temperatures_from_neighbours()
 {
     vector<float> temperatures;
 
+    mpi_debug(prog_name, myrank, parent, "receive_temperatures_from_neighbours begin");
     temperatures = receive_message_from_neighbours<float>(1, MPI_FLOAT);
+    mpi_debug(prog_name, myrank, parent, "receive_temperatures_from_neighbours end");
 
     return temperatures;
 }
@@ -113,7 +116,9 @@ float compute_new_temperature_mean(const vector<float>& temperatures)
 // Envoi nouvelle temperature au coordinateur
 void send_new_temperature_to_coordinator(float new_temperature)
 {
-   // TODO
+    string message = "send_new_temperature_to_coordinator: " + t_to_string(new_temperature);
+    mpi_debug(prog_name, myrank, parent, message);
+    MPI_Send(&new_temperature, 1, MPI_FLOAT, coordinator_slave_id, 0, MPI_COMM_WORLD);
 }
 
 
@@ -123,6 +128,7 @@ void send_new_temperature_to_coordinator(float new_temperature)
  */
 void temperatures_exchange()
 {
+    mpi_debug(prog_name, myrank, parent, "temperatures_exchange begin");
     // Envoi temperature aux voisins
     send_temperature_to_neighbours();
 
@@ -132,9 +138,11 @@ void temperatures_exchange()
     // Calculer la nouvelle temperature
     float new_temperature;
     new_temperature = compute_new_temperature_mean(temperatures);
+    my_temperature = new_temperature;
 
     // Envoi nouvelle temperature au coordinateur
     send_new_temperature_to_coordinator(new_temperature);
+    mpi_debug(prog_name, myrank, parent, "temperatures_exchange end");
 }
 
 // Fonction Reception d'un int
@@ -144,6 +152,8 @@ int receive_simulation_step()
     int simulation_step;
 
     MPI_Recv(&simulation_step, 1, MPI_INT,  coordinator_slave_id, 0, MPI_COMM_WORLD, &status);
+    string message = "receive_simulation_step: " + t_to_string(simulation_step);
+    mpi_debug(prog_name, myrank, parent, message);
 
     return simulation_step;
 }
@@ -152,47 +162,30 @@ int receive_simulation_step()
 /**
  * This is step 4
  */
-void wait_for_int_from_coordinator()
+void start_simulation()
 {
-    int myrank; //Numéro de processus
-    MPI_Comm parent;
+    int simulation_step;
     MPI_Comm_rank(MPI_COMM_WORLD, &myrank);
-    int simulation_step = receive_simulation_step();
 
-    // mpi_debug(prog_name, myrank, parent, "wait_for_int_from_coordinator begin");
-    simulation_step = SIMULATION_PHASE_ENDED; // TODO: for debugging
+    // mpi_debug(prog_name, myrank, parent, "start_simulation begin");
 
-    if(simulation_step > 0)
+    do
     {   
-        // TODO: put back in temperatures_exchange();
-        // TODO: back to wait_for_int_from_coordinator()
+        simulation_step = receive_simulation_step();
+        temperatures_exchange();
+        // simulation_step = SIMULATION_PHASE_ENDED; // TODO: for debugging
     }
-    else
+    while (simulation_step > 0);
+
+    if(simulation_step == SIMULATION_PHASE_ENDED)
     {
-        if(simulation_step == SIMULATION_PHASE_ENDED)
-        {
-            if (parent == MPI_COMM_NULL)
-            {
-                printf("Coordinator %d : Coord : Pas de maitre !\n", myrank);
-            }
-            else
-            {
-                int compteur = 0;
-                // cout << "Fin du traitement du calculator " << myrank << endl;
-                
-                // TODO: review and finish up
-                //MPI_Send(&compteur, 1, MPI_INT, 0, 0,parent );
-                // cout << "Envoi 0 du calculator " << myrank <<endl;
-            }
-        }
+        mpi_debug(prog_name, myrank, parent, "Message de fin");
     }
 }
 
 
 int main(int argc, char *argv[])
 {
-	int myrank;
-	MPI_Comm parent;
 	MPI_Status status;
 
 	prog_name = argv[0];
@@ -204,16 +197,8 @@ int main(int argc, char *argv[])
     mpi_debug(prog_name, myrank, parent, "Calculator created");
 	if (parent != MPI_COMM_NULL)
 	{
-		// MPI_Recv(&compteur, 1, MPI_INT, 0, 0, parent, &status);
-		// TODO: check we can get the actual received size from the status
-		// MPI_Recv(neighbours_array, neighbours_array_size, MPI_INT, 0, 0, parent, &status);
-
         receive_init_struct();
-
-		// MPI_Send(&compteur, 1, MPI_INT, 0, 0, parent);
-		// printf("Child %d : %s : Sending to parent!\n", myrank, prog_name.c_str());
-        wait_for_int_from_coordinator();
-        mpi_debug(prog_name, myrank, parent, "Message de fin");
+        start_simulation();
 	}
         
 
