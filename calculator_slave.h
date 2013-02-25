@@ -51,4 +51,6 @@ vector<T> receive_message_from_neighbours(const int count, const MPI_Datatype da
     return buffers;
 }
 
+
+
 #endif /* CALCULATOR_SLAVE_H_ */

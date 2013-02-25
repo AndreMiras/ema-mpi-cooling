@@ -8,22 +8,22 @@
 
 using namespace std;
 
-const int coordinator_slave_id = 0; // l'id du coordinateur
-const int calculator_slave_id = 1; // les id esclaves demarrent a 1
+static const int coordinator_slave_id = 0; // l'id du coordinateur
+static const int calculator_slave_id = 1; // les id esclaves demarrent a 1
 
 // Matrix plate dimension
-const int matrix_row_size = 3;
-const int matrix_col_size = 4;
+static const int matrix_row_size = 3;
+static const int matrix_col_size = 4;
 
 // number of coordinator process
-const int coordinator_slave_count = 1;
+static const int coordinator_slave_count = 1;
 // number of calculator processes
-const int calculator_slave_count = matrix_row_size * matrix_col_size;
-const int nb_instances = 2;
+static const int calculator_slave_count = matrix_row_size * matrix_col_size;
+static const int nb_instances = 2;
 
-const float current_temperature = 20.0;
+static const float current_temperature = 20.0;
 
-const int NO_NEIGHBOUR_VALUE = -1;
+static const int NO_NEIGHBOUR_VALUE = -1;
 
 /*
  * Neighbours count.
@@ -45,8 +45,8 @@ enum message_type {
 	SIMULATION_PHASE_ENDED,
 };
 */
-const int SIMULATION_PHASE_ENDED = -1;
-const int INIT_PHASE_ENDED = 0;
+static const int SIMULATION_PHASE_ENDED = -1;
+static const int INIT_PHASE_ENDED = 0;
 
 void create_mpi_calculator_init_type(MPI_Datatype& mpi_calculator_init_type);
 
