@@ -503,9 +503,11 @@ void neighbour_array_creation_and_passing(const MPI_Comm& intercomm)
 		calculator_init calculator_init1;
 		memcpy(calculator_init1.neighbours_array, neighbours_array, neighbours_array_size * sizeof(int));
 		calculator_init1.initial_temperature = get_temperature(dest);
+        /*
         string temperature_str = t_to_string(calculator_init1.initial_temperature);
         string message = "calculator_init1.initial_temperature = " + temperature_str;
         mpi_debug(prog_name, myrank, parent, message);
+        */
 
         // Sends neighbours_array and initial_temperature
         MPI_Send(

@@ -41,7 +41,6 @@ vector<T> receive_message_from_neighbours(const int count, const MPI_Datatype da
     for(int i=0; i<NB_NEIGHBOURS; i++)
     {
         neighbour_id = neighbours_array[i];
-        cout << "!! neighbour_id: " << neighbour_id << endl;
         if (neighbour_id == NO_NEIGHBOUR_VALUE)
         {
             buffer = current_temperature;

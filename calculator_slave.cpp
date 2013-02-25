@@ -60,9 +60,7 @@ void receive_init_struct()
     create_mpi_calculator_init_type(mpi_calculator_init_type);
     MPI_Recv(&recv, 1, mpi_calculator_init_type, src, tag, parent, &status);
     my_temperature = recv.initial_temperature;
-    printf("Rank %d: Received: my_temperature = %f\n", myrank, my_temperature);
 
-    printf("Child %d : %s : Receiving from parent!\n", myrank, prog_name.c_str());
     /*
     cout << "neighbours_array[" << NB_NEIGHBOURS << "] = ";
     display_array(recv.neighbours_array, NB_NEIGHBOURS);
@@ -77,7 +75,6 @@ void receive_init_struct()
     cout << endl;
 }
 
-// TODO: sould be async!
 // Envoi temperature aux voisins
 void send_temperature_to_neighbours()
 {

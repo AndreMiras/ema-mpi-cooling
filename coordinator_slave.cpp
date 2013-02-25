@@ -85,13 +85,14 @@ vector<float> receive_all_new_temperatures()
     for(int calculator_id=1; calculator_id < calculator_slave_count; calculator_id++)
     {
         mpi_debug(prog_name, myrank, parent, "MPI_Recv begin");
-        MPI_Recv(&temperature, 1, MPI_FLOAT, 0, 0, MPI_COMM_WORLD, &status);
+        MPI_Recv(&temperature, 1, MPI_FLOAT, calculator_id, 0, MPI_COMM_WORLD, &status);
         mpi_debug(prog_name, myrank, parent, "MPI_Recv end");
         temperatures_array.push_back(temperature);
         string temperature_str = t_to_string(temperature);
         string message = "Received one temperature: " + temperature_str;
         mpi_debug(prog_name, myrank, parent, message);
     }
+    mpi_debug(prog_name, myrank, parent, "receive_all_new_temperatures end");
     display_array(temperatures_array);
 
     return temperatures_array;
