@@ -52,5 +52,18 @@ vector<T> receive_message_from_neighbours(const int count, const MPI_Datatype da
 }
 
 
+template <class T>
+void send_message_to_neighbours(const T& buffer, const int count, const MPI_Datatype datatype)
+{
+    int id;
+    T tempBuffer = buffer; // because MPI_Send only acccepts "void" and not "const void"
+
+    for(int i=0; i<NB_NEIGHBOURS; i++)
+    {
+        id = neighbours_array[i];
+        MPI_Send(&tempBuffer, count, datatype, id, 0, MPI_COMM_WORLD);
+    }
+}
+
 
 #endif /* CALCULATOR_SLAVE_H_ */

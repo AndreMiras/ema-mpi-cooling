@@ -80,7 +80,7 @@ void receive_init_struct()
 void send_temperature_to_neighbours()
 {
     // send_message_to_neighbours(void* buffer, const int count, const MPI_Datatype datatype);
-    send_message_to_neighbours(&temperature, 1, MPI_FLOAT);
+    send_message_to_neighbours<float>(temperature, 1, MPI_FLOAT);
 }
 
 // Recevoir temperature des voisins
@@ -110,19 +110,6 @@ double process_new_temperatures(const vector<float>& temperatures)
 void send_new_temperature_to_coordinator(double new_temperature)
 {
     
-}
-
-
-// TODO: use generics rather than void
-void send_message_to_neighbours(void* buffer, const int count, const MPI_Datatype datatype)
-{
-    int id;
-
-    for(int i=0; i<NB_NEIGHBOURS; i++)
-    {
-        id = neighbours_array[i];
-        MPI_Send(buffer, count, datatype, id, 0, MPI_COMM_WORLD);
-    }
 }
 
 
