@@ -1,5 +1,4 @@
 #include "calculator_slave.h"
-#include "utils.h"
 #include <vector>
 #include <mpi.h>
 #include <stdio.h>
@@ -64,7 +63,8 @@ void receive_init_struct()
     create_mpi_calculator_init_type(mpi_calculator_init_type);
     // MPI_Recv(neighbours_array, neighbours_array_size, MPI_INT, 0, 0, parent, &status);
     MPI_Recv(&recv, 1, mpi_calculator_init_type, src, tag, parent, &status);
-    printf("Rank %d: Received: temperature = %f\n", myrank, recv.initial_temperature);
+    temperature = recv.initial_temperature;
+    printf("Rank %d: Received: temperature = %f\n", myrank, temperature);
 
     printf("Child %d : %s : Receiving from parent!\n", myrank, prog_name.c_str());
     cout << "neighbours_array[" << NB_NEIGHBOURS << "] = ";
@@ -79,90 +79,112 @@ void receive_init_struct()
 // Envoi temperature aux voisins
 void send_temperature_to_neighbours()
 {
-    
+    // send_message_to_neighbours(void* buffer, const int count, const MPI_Datatype datatype);
+    send_message_to_neighbours(&temperature, 1, MPI_FLOAT);
 }
 
-//Recevoir temperature des voisins
-void recv_temperature_from_neighbours(int* temperatures)
+// Recevoir temperature des voisins
+vector<float> receive_temperatures_from_neighbours()
 {
-    
+    vector<float> temperatures;
+
+    // TODO: use generics
+    // temperatures = receive_message_from_neighbours(1, MPI_FLOAT);
+
+    return temperatures;
 }
 
-//Calculer la nouvelle temperature
-double process_new_temperature(int* temperatures)
+// TODO
+// Calculer la nouvelle temperature
+double process_new_temperatures(const vector<float>& temperatures)
 {
     double temperature;
      
-        //(si voisin = -1, alors TemperatureReçue[voisin] = 20°C (température ambiante de la plaque))
+    // (si voisin = -1, alors TemperatureReçue[voisin] = 20°C (température ambiante de la plaque))
     
-    //temperature = (Tcourant + somme(voisin =0 ? 7)(TemperatureReçue[voisin]) ) / 9
+    // temperature = (Tcourant + somme(voisin =0 ? 7)(TemperatureReçue[voisin]) ) / 9
     
     return temperature;
 }
 
-//Envoi nouvelle temperature au coordinateur
-void send_new_temperature(double new_temperature)
+// Envoi nouvelle temperature au coordinateur
+void send_new_temperature_to_coordinator(double new_temperature)
 {
     
 }
 
 
-void traitement_temperatures()
+// TODO: use generics rather than void
+void send_message_to_neighbours(void* buffer, const int count, const MPI_Datatype datatype)
+{
+    int id;
+
+    for(int i=0; i<NB_NEIGHBOURS; i++)
+    {
+        id = neighbours_array[i];
+        MPI_Send(buffer, count, datatype, id, 0, MPI_COMM_WORLD);
+    }
+}
+
+
+/**
+ * Sends temperature to neighbours asynchroniously.
+ * Receives neighbours' temperatures.
+ */
+void temperatures_exchange()
 {
     // Envoi temperature aux voisins
     send_temperature_to_neighbours();
 
-    //Recevoir temperature des voisins
-    int temperatures[9];
-    recv_temperature_from_neighbours(temperatures);
+    // Recevoir temperature des voisins
+    vector<float> temperatures = receive_temperatures_from_neighbours();
 
-    //Calculer la nouvelle temperature
+    // Calculer la nouvelle temperature
     double new_temperature;
-    new_temperature = process_new_temperature(temperatures);
+    new_temperature = process_new_temperatures(temperatures);
 
-    //Envoi nouvelle temperature au coordinateur
-    send_new_temperature(new_temperature);
+    // Envoi nouvelle temperature au coordinateur
+    send_new_temperature_to_coordinator(new_temperature);
 }
 
 // TODO: review this code (written by Del)
 /**
  * This is step 4
  */
-void send_end_message()
+void wait_for_int_from_coordinator()
 {
     int myrank; //Numéro de processus
     MPI_Comm parent;
-    MPI_Status etat;
+    MPI_Status status;
 
     MPI_Comm_rank (MPI_COMM_WORLD,&myrank);
 
-    int coordinateur;
+    int simulation_step;
 
-    //TODO Fonction Reception d'un int
-    //Sinon, en attente de reception
-    //MPI_Recv(&coordinateur, 0, int, 0, 0, parent, &etat); // pas sure pour le "parent"
+    // Fonction Reception d'un int
+    MPI_Recv(&simulation_step, 0, MPI_INT, 0, 0, coordinator_slave_id, &status);
 
-    if(coordinateur > 0)
+    if(simulation_step > 0)
     {   
-        traitement_temperatures();   
-        //TODO Back to wait_for_int_from_coord()
+        temperatures_exchange();
+        // TODO: back to wait_for_int_from_coordinator()
     }
     else
     {
-        if(coordinateur == -1 )
+        if(simulation_step == SIMULATION_PHASE_ENDED)
         {
             if (parent == MPI_COMM_NULL)
             {
-                printf ("Coordinator %d : Coord : Pas de maitre !\n", myrank);
+                printf("Coordinator %d : Coord : Pas de maitre !\n", myrank);
             }
             else
             {
                 int compteur = 0;
-                cout<<"Fin du traitement du calculator "<<myrank<<endl;
+                cout << "Fin du traitement du calculator " << myrank << endl;
                 
                 //REVIEWWWWWWWWWWWWWWWWWWWWWWWWWWW
                 //MPI_Send(&compteur, 1, MPI_INT, 0, 0,parent );
-                cout<<"Envoi 0 du calculator "<<myrank<<endl;
+                cout << "Envoi 0 du calculator " << myrank <<endl;
             }
         }
     }
@@ -171,7 +193,6 @@ void send_end_message()
 
 int main(int argc, char *argv[])
 {
-	int neighbours_array[NB_NEIGHBOURS]; // neighbours array to be received
 	int myrank;
 	MPI_Comm parent;
 	MPI_Status status;
@@ -193,9 +214,9 @@ int main(int argc, char *argv[])
 
 		// MPI_Send(&compteur, 1, MPI_INT, 0, 0, parent);
 		// printf("Child %d : %s : Sending to parent!\n", myrank, prog_name.c_str());
+        wait_for_int_from_coordinator();
 	}
         
-    send_end_message();
 
 	MPI_Finalize();
 	return 0;

@@ -1,3 +1,5 @@
+#ifndef MASTER_H_
+#define MASTER_H_
 #include <vector>
 #include <iostream>
 
@@ -16,3 +18,4 @@ float get_initial_temperature(int process);
  * returns the temperature of a given process
  */
 float get_temperature(int process);
+#endif /* MASTER_H_ */

@@ -1,3 +1,5 @@
+#ifndef UTILS_H_
+#define UTILS_H_
 #include <vector>
 #include <string>
 #include <sstream>
@@ -19,6 +21,15 @@ const int coordinator_slave_count = 1;
 const int calculator_slave_count = matrix_row_size * matrix_col_size;
 const int nb_instances = 2;
 
+const float current_temperature = 20.0;
+
+const int NO_NEIGHBOUR_VALUE = -1;
+
+/*
+ * Neighbours count.
+ * It could be more or less than 8 neighbours,
+ * for example if plates are not squared.
+ */
 #define NB_NEIGHBOURS 8
 /*
  * Contains calculator neighbour and initial temperature
@@ -88,3 +99,4 @@ std::string t_to_string(T i)
 
     return s;
 }
+#endif /* UTILS_H_ */

@@ -1,3 +1,5 @@
+#ifndef CALCULATOR_SLAVE_H_
+#define CALCULATOR_SLAVE_H_
 #include "coordinator_slave.h"
 #include "utils.h"
 #include <stdio.h>
@@ -115,10 +117,8 @@ float compute_mean_temperature(vector<float> temperatures_array)
 // TODO: perhaps we could use MPI_Bcast
 void send_message_to_calculators(void* buffer, const int count, const MPI_Datatype datatype)
 {
-    int calculators_count = 9; // TODO: hardcoded
-    for(int id=calculator_slave_id; id<calculators_count; id++)
+    for(int id=calculator_slave_id; id<calculator_slave_count; id++)
     {
-		// MPI_Send(&step_number, 1, MPI_INT, id, 0, MPI_COMM_WORLD);
 		MPI_Send(buffer, count, datatype, id, 0, MPI_COMM_WORLD);
     }
 }
@@ -142,7 +142,6 @@ void start_simulation(int simulation_step) // TODO: give relevant name
     vector<float> temperatures_array = receive_all_new_temperatures();
     float mean_temperature = compute_mean_temperature(temperatures_array);
 
-    float current_temperature = 20.0; // TODO: hardcoded
     float delta_temperature = abs(mean_temperature - current_temperature);
     delta_temperature = 0; // TODO: for debugging purpose
     if (delta_temperature > epsilon)
@@ -186,3 +185,4 @@ int main(int argc, char *argv[])
 	MPI_Finalize();
 	return 0;
 }
+#endif /* CALCULATOR_SLAVE_H_ */

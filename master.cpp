@@ -3,7 +3,6 @@
 #include <mpi.h>
 #include <stdio.h>
 
-#define NO_NEIGHBOUR_VALUE	-1
 #define NORTH			-1
 #define SOUTH			 1
 #define EAST			 1
@@ -345,7 +344,7 @@ float get_initial_temperature(int process)
     }
     else
     {
-        initial_temperature = 20.0;
+        initial_temperature = current_temperature;
     }
 
 	return initial_temperature;
