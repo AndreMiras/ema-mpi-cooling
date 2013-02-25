@@ -6,6 +6,8 @@
 using namespace std;
 
 string prog_name;
+int myrank;
+MPI_Comm parent;
 
 const float epsilon = 0.5;
 

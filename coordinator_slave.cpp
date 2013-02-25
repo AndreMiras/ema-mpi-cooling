@@ -13,12 +13,8 @@ using namespace std;
 void wait_init_phase_ended_message()
 {
     int message;
-    int myrank;
     MPI_Status status;
-    MPI_Comm parent;
 
-    MPI_Comm_get_parent(&parent);
-	MPI_Comm_rank(MPI_COMM_WORLD, &myrank);
     mpi_debug(prog_name, myrank, parent, "wait_init_phase_ended_message begin");
 
     mpi_debug(prog_name, myrank, parent, "wait_init_phase_ended_message MPI_Recv begin");
@@ -41,8 +37,6 @@ void wait_init_phase_ended_message()
  */
 void send_simulation_phase_ended_message()
 {
-    MPI_Comm parent;
-    MPI_Comm_get_parent(&parent);
     int message = SIMULATION_PHASE_ENDED;
 
     cout << "send_simulation_phase_ended_message: SIMULATION_PHASE_ENDED: " << SIMULATION_PHASE_ENDED << endl;
@@ -55,12 +49,10 @@ void send_simulation_phase_ended_message()
 }
 
 
-
+// TODO: deprecated?
 int recv_from_calc(int id){
     int message = 0;
     MPI_Status status;
-    MPI_Comm parent;
-    MPI_Comm_get_parent(&parent);
 
     //TODO Reception
     //MPI_Recv(&message, 1, MPI_INT, id, 0, 1, &status);
@@ -70,6 +62,7 @@ int recv_from_calc(int id){
     return message;
 }
 
+// TODO: deprecated?
 void recv_from_all_calc() {
        int tab[9];
        for(int i=1; i< 9; i++)
@@ -82,14 +75,9 @@ void recv_from_all_calc() {
 
 vector<float> receive_all_new_temperatures()
 {
-	int myrank;
 	float temperature;
-	MPI_Comm parent;
 	MPI_Status status;
     vector<float> temperatures_array;
-
-	MPI_Comm_get_parent(&parent);
-	MPI_Comm_rank(MPI_COMM_WORLD, &myrank);
 
     mpi_debug(prog_name, myrank, parent, "receive_all_new_temperatures");
     // TODO: perhaps we could use MPI_Gather
@@ -127,10 +115,6 @@ float compute_mean_temperature(vector<float> temperatures_array)
 // TODO: perhaps we could use MPI_Bcast
 void send_message_to_calculators(void* buffer, const int count, const MPI_Datatype datatype)
 {
-    MPI_Comm parent;
-    int myrank;
-	MPI_Comm_get_parent(&parent);
-	MPI_Comm_rank(MPI_COMM_WORLD, &myrank);
     mpi_debug(prog_name, myrank, parent, "send_message_to_calculators");
 
     for(int id=calculator_slave_id; id<calculator_slave_count; id++)
@@ -165,16 +149,14 @@ void start_simulation(int simulation_step) // TODO: give relevant name
     }
     else
     {
-        // mpi_debug(prog_name, myrank, parent, "delta_temperature > epsilon");
+        mpi_debug(prog_name, myrank, parent, "delta_temperature > epsilon");
     }
 }
 
 int main(int argc, char *argv[])
 {
     prog_name = argv[0];
-    int myrank;
     int message;
-    MPI_Comm parent;
     MPI_Status status;
 
     MPI_Init(&argc, &argv);

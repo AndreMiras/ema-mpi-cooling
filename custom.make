@@ -19,7 +19,7 @@ ${OUT_DIR}:
 program: master calculator_slave coordinator_slave
 
 # master
-master: master.cpp utils.o
+master: master.cpp master.h utils.o
 	$(CC) $(LDFLAGS) -o $@ $^
 
 
@@ -27,17 +27,17 @@ master: master.cpp utils.o
 calculator_slave: calculator_slave.o utils.o
 	$(CC) $(LDFLAGS) -o $@ $^
 
-calculator_slave.o: calculator_slave.cpp
+calculator_slave.o: calculator_slave.cpp calculator_slave.h
 	$(CC) $(CFLAGS) -c -o $@ $<
 
 # coordinator_slave
 coordinator_slave: coordinator_slave.o utils.o
 	$(CC) $(LDFLAGS) -o $@ $^
 
-coordinator_slave.o: coordinator_slave.cpp
+coordinator_slave.o: coordinator_slave.cpp coordinator_slave.h
 	$(CC) $(CFLAGS) -c -o $@ $<
 
-utils.o: utils.cpp
+utils.o: utils.cpp utils.h
 	$(CC) $(CFLAGS) -c -o $@ $<
 
 clean:

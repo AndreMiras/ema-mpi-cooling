@@ -42,8 +42,6 @@ vector<T> receive_message_from_neighbours(const int count, const MPI_Datatype da
     {
         neighbour_id = neighbours_array[i];
         cout << "!! neighbour_id: " << neighbour_id << endl;
-        cout << "neighbours_array[" << NB_NEIGHBOURS << "] = ";
-        display_array(neighbours_array, NB_NEIGHBOURS);
         if (neighbour_id == NO_NEIGHBOUR_VALUE)
         {
             buffer = current_temperature;
@@ -52,7 +50,7 @@ vector<T> receive_message_from_neighbours(const int count, const MPI_Datatype da
         {
             string message = "receive_message_from_neighbours MPI_Recv, neighbour_id: " + t_to_string(neighbour_id) + " begin";
             mpi_debug(prog_name, myrank, parent, message);
-            MPI_Recv(&buffer, count, datatype, neighbour_id, tag, MPI_COMM_WORLD, &status);
+            MPI_Recv(&buffer, count, datatype, neighbour_id, tag, MPI_COMM_WORLD, &status); // TODO: debug put back in
             mpi_debug(prog_name, myrank, parent, "receive_message_from_neighbours MPI_Recv end");
         }
         buffers.push_back(buffer); // TODO: finish up usig generics
@@ -82,11 +80,18 @@ void send_asynchronous_message_to_neighbours(const T& buffer, const int count, c
     int id;
     T tempBuffer = buffer; // because MPI_Send only acccepts "void" and not "const void"
     MPI_Request request;
+    float temperature_for_tests = 30.0;
 
     for(int i=0; i<NB_NEIGHBOURS; i++)
     {
         id = neighbours_array[i];
-        MPI_Isend(&tempBuffer, count, datatype, id, 0, MPI_COMM_WORLD, &request);
+        if (id != NO_NEIGHBOUR_VALUE)
+        {
+            string message = "send_asynchronous_message_to_neighbours: MPI_Isend to id=" + t_to_string(id);
+            mpi_debug(prog_name, myrank, parent, message);
+            MPI_Isend(&tempBuffer, count, datatype, id, 0, MPI_COMM_WORLD, &request);
+            mpi_debug(prog_name, myrank, parent, "send_asynchronous_message_to_neighbours end");
+        }
     }
 }
 
