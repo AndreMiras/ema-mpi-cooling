@@ -40,7 +40,7 @@ void send_simulation_phase_ended_message()
     MPI_Send(&message, 1, MPI_INT, 0, 0, parent);
 
     // sends to calculators
-    // send_message_to_calculators(&message, 1, MPI_INT); // TODO: test and put back in
+    send_message_to_calculators(&message, 1, MPI_INT);
 }
 
 
@@ -172,12 +172,10 @@ int main(int argc, char *argv[])
         start_simulation(1);
         send_simulation_phase_ended_message();
     }
-    else
-    {
-        mpi_debug(prog_name, myrank, parent, "wait_init_phase_ended_message oops");
-    }
 
+    mpi_debug(prog_name, myrank, parent, "MPI_Finalizing");
     MPI_Finalize();
+    mpi_debug(prog_name, myrank, parent, "MPI_Finalized");
     return 0;
 }
 #endif /* CALCULATOR_SLAVE_H_ */

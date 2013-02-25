@@ -1,5 +1,6 @@
 #ifndef MASTER_H_
 #define MASTER_H_
+#include <mpi.h>
 #include <vector>
 #include <iostream>
 
@@ -7,6 +8,8 @@ using namespace std;
 
 const int tag = 0;
 string prog_name;
+int myrank;
+MPI_Comm parent;
 
 vector<vector<float> > temperature_matrix;
 vector<vector<int> > processes_matrix;

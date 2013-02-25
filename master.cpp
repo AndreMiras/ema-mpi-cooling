@@ -1,6 +1,5 @@
 #include "master.h"
 #include "utils.h"
-#include <mpi.h>
 #include <stdio.h>
 
 #define NORTH			-1
@@ -465,11 +464,6 @@ MPI_Comm create_coordinator_slave_and_calculators_slaves()
 
 void neighbour_array_creation_and_passing(const MPI_Comm& intercomm)
 {
-    int myrank;
-    MPI_Comm parent;
-    MPI_Comm_get_parent(&parent);
-    MPI_Comm_rank(MPI_COMM_WORLD, &myrank);
-
 	const int neighbours_array_size = NB_NEIGHBOURS;
 	int neighbours_array[neighbours_array_size]; // neighbours array to be sent
 
@@ -539,6 +533,9 @@ int main(int argc, char *argv[])
 	MPI_Comm intercomm; // L'espace de communication père - fils
 	MPI_Init(&argc, &argv);
     prog_name = argv[0];
+    MPI_Comm_get_parent(&parent);
+    MPI_Comm_rank(MPI_COMM_WORLD, &myrank);
+
 
     // 1 Slaves plus coordinator creation
     intercomm = create_coordinator_slave_and_calculators_slaves();
@@ -552,7 +549,7 @@ int main(int argc, char *argv[])
 	// Attend la fin de la simulation (message envoyé par le coordinateur
 	wait_simulation_phase_ended_message(intercomm);
 
-	printf ("Pere : Fin.\n");
+    mpi_debug(prog_name, myrank, parent, "Master end");
 
     // TODO: don't we do a MPI_Comm_free?
 	MPI_Finalize();

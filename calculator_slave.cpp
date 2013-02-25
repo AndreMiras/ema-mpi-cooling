@@ -196,7 +196,6 @@ int main(int argc, char *argv[])
         receive_init_struct();
         start_simulation();
 	}
-        
 
 	MPI_Finalize();
 	return 0;
