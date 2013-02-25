@@ -6,11 +6,11 @@ using namespace std;
 
 string prog_name;
 int neighbours_array[NB_NEIGHBOURS]; // neighbours array to be received
-float temperature; // calculator temperature
+float my_temperature; // calculator temperature
 
 int main(int argc, char *argv[]);
-void send_message_to_neighbours(void* buffer, const int count, const MPI_Datatype datatype);
-vector<void> receive_message_from_neighbours(const int count, const MPI_Datatype datatype);
+void send_new_temperature_to_coordinator(float new_temperature);
+float compute_new_temperature_mean(const vector<float>& temperatures);
 void temperatures_exchange();
 void wait_for_int_from_coordinator();
 double process_new_temperatures(const vector<float>& temperatures);

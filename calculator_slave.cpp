@@ -63,8 +63,8 @@ void receive_init_struct()
     create_mpi_calculator_init_type(mpi_calculator_init_type);
     // MPI_Recv(neighbours_array, neighbours_array_size, MPI_INT, 0, 0, parent, &status);
     MPI_Recv(&recv, 1, mpi_calculator_init_type, src, tag, parent, &status);
-    temperature = recv.initial_temperature;
-    printf("Rank %d: Received: temperature = %f\n", myrank, temperature);
+    my_temperature = recv.initial_temperature;
+    printf("Rank %d: Received: my_temperature = %f\n", myrank, my_temperature);
 
     printf("Child %d : %s : Receiving from parent!\n", myrank, prog_name.c_str());
     cout << "neighbours_array[" << NB_NEIGHBOURS << "] = ";
@@ -79,8 +79,7 @@ void receive_init_struct()
 // Envoi temperature aux voisins
 void send_temperature_to_neighbours()
 {
-    // send_message_to_neighbours(void* buffer, const int count, const MPI_Datatype datatype);
-    send_message_to_neighbours<float>(temperature, 1, MPI_FLOAT);
+    send_message_to_neighbours<float>(my_temperature, 1, MPI_FLOAT);
 }
 
 // Recevoir temperature des voisins
@@ -93,23 +92,24 @@ vector<float> receive_temperatures_from_neighbours()
     return temperatures;
 }
 
-// TODO
 // Calculer la nouvelle temperature
-double process_new_temperatures(const vector<float>& temperatures)
+float compute_new_temperature_mean(const vector<float>& temperatures)
 {
-    double temperature;
-     
-    // (si voisin = -1, alors TemperatureReçue[voisin] = 20°C (température ambiante de la plaque))
-    
-    // temperature = (Tcourant + somme(voisin =0 ? 7)(TemperatureReçue[voisin]) ) / 9
+    float temperature = my_temperature;
+
+    for(int i=0; i < temperatures.size(); i++)
+    {
+        temperature += temperatures.at(0);
+    }
+    temperature = (temperature / (temperatures.size() + 1));
     
     return temperature;
 }
 
 // Envoi nouvelle temperature au coordinateur
-void send_new_temperature_to_coordinator(double new_temperature)
+void send_new_temperature_to_coordinator(float new_temperature)
 {
-    
+   // TODO
 }
 
 
@@ -126,8 +126,8 @@ void temperatures_exchange()
     vector<float> temperatures = receive_temperatures_from_neighbours();
 
     // Calculer la nouvelle temperature
-    double new_temperature;
-    new_temperature = process_new_temperatures(temperatures);
+    float new_temperature;
+    new_temperature = compute_new_temperature_mean(temperatures);
 
     // Envoi nouvelle temperature au coordinateur
     send_new_temperature_to_coordinator(new_temperature);
