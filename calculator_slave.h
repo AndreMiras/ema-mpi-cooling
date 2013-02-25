@@ -28,8 +28,8 @@ void create_matrix_from_neighbours_array(const int neighbours_array[], const int
 template <class T>
 vector<T> receive_message_from_neighbours(const int count, const MPI_Datatype datatype)
 {
-    // vector<void> buffers; // TODO: use generics
-    float buffer; // TODO: use generics
+    vector<T> buffers;
+    T buffer;
     MPI_Status status;
     const int tag = 0; // TODO[DRY]: use global utils.h tag value
     int id;
@@ -45,10 +45,10 @@ vector<T> receive_message_from_neighbours(const int count, const MPI_Datatype da
         {
             MPI_Recv(&buffer, count, datatype, id, tag, MPI_COMM_WORLD, &status);
         }
-        // buffers.push_back(buffer); // TODO: finish up usig generics
+        buffers.push_back(buffer); // TODO: finish up usig generics
     }
 
-    // TODO finish up // return buffers;
+    return buffers;
 }
 
 #endif /* CALCULATOR_SLAVE_H_ */

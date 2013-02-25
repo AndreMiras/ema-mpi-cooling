@@ -88,8 +88,7 @@ vector<float> receive_temperatures_from_neighbours()
 {
     vector<float> temperatures;
 
-    // TODO: use generics
-    // temperatures = receive_message_from_neighbours(1, MPI_FLOAT);
+    temperatures = receive_message_from_neighbours<float>(1, MPI_FLOAT);
 
     return temperatures;
 }
