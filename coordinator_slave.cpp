@@ -4,7 +4,6 @@
 #include "utils.h"
 #include <stdio.h>
 #include <stdlib.h>
-#include <vector>
 #include <iostream>
 
 using namespace std;
@@ -72,6 +71,7 @@ vector<float> receive_all_new_temperatures()
 {
     string message;
 	float temperature;
+    int row, col;
 	MPI_Status status;
     vector<float> temperatures_array;
 
@@ -86,9 +86,16 @@ vector<float> receive_all_new_temperatures()
         message = "MPI_Recv end, Received one temperature from: " + t_to_string(calculator_id) + " end";
         mpi_debug(prog_name, myrank, parent, message);
         temperatures_array.push_back(temperature);
+
+        // updates the temperature_matrix
+        get_calculator_row_col(calculator_id, matrix_row_size, matrix_col_size, row, col);
+        temperature_matrix[row][col] = temperature;
+
+
     }
     mpi_debug(prog_name, myrank, parent, "receive_all_new_temperatures end");
-    display_array(temperatures_array);
+    // display_array(temperatures_array);
+    display_matrix(temperature_matrix);
 
     return temperatures_array;
 }
@@ -129,6 +136,8 @@ void send_message_to_calculators(void* buffer, const int count, const MPI_Dataty
  */
 void start_simulation(int simulation_step) // TODO: give relevant name
 {
+    string message = "start_simulation simulation_step: " + t_to_string(simulation_step);
+    mpi_debug(prog_name, myrank, parent, message);
     // sends simulation step to calculators
     send_message_to_calculators(&simulation_step, 1, MPI_INT);
 
@@ -137,15 +146,24 @@ void start_simulation(int simulation_step) // TODO: give relevant name
     float mean_temperature = compute_mean_temperature(temperatures_array);
 
     float delta_temperature = abs(mean_temperature - current_temperature);
-    delta_temperature = 0; // TODO: for debugging purpose
     if (delta_temperature > epsilon)
     {
-        simulation_step++; // TODO: before or after
-        // start_simulation(simulation_step); // TODO: commented out for debugging purpose
+        simulation_step++;
+        start_simulation(simulation_step);
     }
     else
     {
         mpi_debug(prog_name, myrank, parent, "delta_temperature > epsilon");
+    }
+}
+
+void init_temperature_matrix()
+{
+    temperature_matrix.clear();
+    vector<float> one_row(matrix_col_size);
+    for(int i = 0; i < matrix_row_size; i++)
+    {
+        temperature_matrix.push_back(one_row);
     }
 }
 
@@ -165,6 +183,7 @@ int main(int argc, char *argv[])
     {
         // the master sends the coordinator the init phase ended so the coordinator can start its work
         wait_init_phase_ended_message();
+    init_temperature_matrix();
 
         // recv_from_all_calc(); // TODO
 

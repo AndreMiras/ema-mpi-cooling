@@ -260,7 +260,7 @@ void init_neighbours_array(int neighbours_array[], int neighbours_array_size)
 	}
 }
 
-void init_temperature_matrix(vector<vector<float> >& matrix, const int matrix_row_size, const int matrix_col_size)
+void init_initial_temperature_matrix(vector<vector<float> >& matrix, const int matrix_row_size, const int matrix_col_size)
 {
 	vector<float> array;
 	int calculator_num = calculator_slave_first_id;
@@ -415,12 +415,12 @@ void neighbour_array_creation_and_passing(const MPI_Comm& intercomm)
 	const int neighbours_array_size = NB_NEIGHBOURS;
 	int neighbours_array[neighbours_array_size]; // neighbours array to be sent
 
-	init_temperature_matrix(temperature_matrix, matrix_row_size, matrix_col_size);
+	init_initial_temperature_matrix(initial_temperature_matrix, matrix_row_size, matrix_col_size);
 	init_calculators_ids_matrix(calculators_ids_matrix, matrix_row_size, matrix_col_size);
 	cout << "calculators_ids_matrix[" << calculators_ids_matrix.size() << "][" << calculators_ids_matrix[0].size() << "] = ";
 	display_matrix<int>(calculators_ids_matrix);
-	cout << "temperature_matrix[" << temperature_matrix.size() << "][" << temperature_matrix[0].size() << "] = ";
-	display_matrix<float>(temperature_matrix);
+	cout << "initial_temperature_matrix[" << initial_temperature_matrix.size() << "][" << initial_temperature_matrix[0].size() << "] = ";
+	display_matrix<float>(initial_temperature_matrix);
 	int calculator_row, calculator_col;
 	// on ne communique qu'avec les calculateurs (le coordinateur a l'id 0)
 	for (int dest = calculator_slave_first_id; dest <= calculator_slave_last_id; dest++)
@@ -444,7 +444,7 @@ void neighbour_array_creation_and_passing(const MPI_Comm& intercomm)
 		// Sets neighbours_array and initial_temperature
 		calculator_init calculator_init1;
 		memcpy(calculator_init1.neighbours_array, neighbours_array, neighbours_array_size * sizeof(int));
-		calculator_init1.initial_temperature = get_temperature(calculators_ids_matrix, temperature_matrix, dest);
+		calculator_init1.initial_temperature = get_temperature(calculators_ids_matrix, initial_temperature_matrix, dest);
         /*
         string temperature_str = t_to_string(calculator_init1.initial_temperature);
         string message = "calculator_init1.initial_temperature = " + temperature_str;

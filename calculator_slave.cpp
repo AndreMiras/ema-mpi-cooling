@@ -88,9 +88,7 @@ vector<float> receive_temperatures_from_neighbours()
 {
     vector<float> temperatures;
 
-    mpi_debug(prog_name, myrank, parent, "receive_temperatures_from_neighbours begin");
     temperatures = receive_message_from_neighbours<float>(1, MPI_FLOAT);
-    mpi_debug(prog_name, myrank, parent, "receive_temperatures_from_neighbours end");
 
     return temperatures;
 }
@@ -102,7 +100,7 @@ float compute_new_temperature_mean(const vector<float>& temperatures)
 
     for(int i=0; i < temperatures.size(); i++)
     {
-        temperature += temperatures.at(0);
+        temperature += temperatures.at(i);
     }
     temperature = (temperature / (temperatures.size() + 1));
     
@@ -124,7 +122,7 @@ void send_new_temperature_to_coordinator(float new_temperature)
  */
 void temperatures_exchange()
 {
-    mpi_debug(prog_name, myrank, parent, "temperatures_exchange begin");
+    mpi_debug(prog_name, myrank, parent, "temperatures_exchange");
     // Envoi temperature aux voisins
     send_temperature_to_neighbours();
 
@@ -138,7 +136,6 @@ void temperatures_exchange()
 
     // Envoi nouvelle temperature au coordinateur
     send_new_temperature_to_coordinator(new_temperature);
-    mpi_debug(prog_name, myrank, parent, "temperatures_exchange end");
 }
 
 // Fonction Reception d'un int
@@ -148,8 +145,8 @@ int receive_simulation_step()
     int simulation_step;
 
     MPI_Recv(&simulation_step, 1, MPI_INT,  coordinator_slave_id, 0, MPI_COMM_WORLD, &status);
-    string message = "receive_simulation_step: " + t_to_string(simulation_step);
-    mpi_debug(prog_name, myrank, parent, message);
+    // string message = "receive_simulation_step: " + t_to_string(simulation_step);
+    // mpi_debug(prog_name, myrank, parent, message);
 
     return simulation_step;
 }
@@ -163,13 +160,10 @@ void start_simulation()
     int simulation_step;
     MPI_Comm_rank(MPI_COMM_WORLD, &myrank);
 
-    // mpi_debug(prog_name, myrank, parent, "start_simulation begin");
-
     do
     {   
         simulation_step = receive_simulation_step();
         temperatures_exchange();
-        // simulation_step = SIMULATION_PHASE_ENDED; // TODO: for debugging
     }
     while (simulation_step > 0);
 
