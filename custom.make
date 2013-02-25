@@ -41,4 +41,5 @@ utils.o: utils.cpp
 	$(CC) $(CFLAGS) -c -o $@ $<
 
 clean:
-	rm -rf *.o
+	rm -f *.o
+	rm -f master coordinator_slave calculator_slave
