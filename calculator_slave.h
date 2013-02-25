@@ -9,6 +9,7 @@ int neighbours_array[NB_NEIGHBOURS]; // neighbours array to be received
 float my_temperature; // calculator temperature
 
 int main(int argc, char *argv[]);
+int receive_simulation_step();
 void send_new_temperature_to_coordinator(float new_temperature);
 float compute_new_temperature_mean(const vector<float>& temperatures);
 void temperatures_exchange();

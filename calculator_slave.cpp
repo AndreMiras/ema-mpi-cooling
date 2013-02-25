@@ -67,12 +67,16 @@ void receive_init_struct()
     printf("Rank %d: Received: my_temperature = %f\n", myrank, my_temperature);
 
     printf("Child %d : %s : Receiving from parent!\n", myrank, prog_name.c_str());
+    /*
     cout << "neighbours_array[" << NB_NEIGHBOURS << "] = ";
     display_array(recv.neighbours_array, NB_NEIGHBOURS);
+    */
     vector<vector<int> > matrix;
     create_matrix_from_neighbours_array(recv.neighbours_array, NB_NEIGHBOURS, myrank, matrix);
+    /*
     cout << "neighbours_matrix[" << matrix.size() << "][" << matrix[0].size() << "] = ";
     display_matrix<int>(matrix);
+    */
     cout << endl;
 }
 
@@ -133,6 +137,17 @@ void temperatures_exchange()
     send_new_temperature_to_coordinator(new_temperature);
 }
 
+// Fonction Reception d'un int
+int receive_simulation_step()
+{
+    MPI_Status status;
+    int simulation_step;
+
+    MPI_Recv(&simulation_step, 1, MPI_INT,  coordinator_slave_id, 0, MPI_COMM_WORLD, &status);
+
+    return simulation_step;
+}
+
 // TODO: review this code (written by Del)
 /**
  * This is step 4
@@ -141,18 +156,15 @@ void wait_for_int_from_coordinator()
 {
     int myrank; //Numéro de processus
     MPI_Comm parent;
-    MPI_Status status;
+    MPI_Comm_rank(MPI_COMM_WORLD, &myrank);
+    int simulation_step = receive_simulation_step();
 
-    MPI_Comm_rank (MPI_COMM_WORLD,&myrank);
-
-    int simulation_step;
-
-    // Fonction Reception d'un int
-    MPI_Recv(&simulation_step, 0, MPI_INT, 0, 0, coordinator_slave_id, &status);
+    // mpi_debug(prog_name, myrank, parent, "wait_for_int_from_coordinator begin");
+    simulation_step = SIMULATION_PHASE_ENDED; // TODO: for debugging
 
     if(simulation_step > 0)
     {   
-        temperatures_exchange();
+        // TODO: put back in temperatures_exchange();
         // TODO: back to wait_for_int_from_coordinator()
     }
     else
@@ -166,11 +178,11 @@ void wait_for_int_from_coordinator()
             else
             {
                 int compteur = 0;
-                cout << "Fin du traitement du calculator " << myrank << endl;
+                // cout << "Fin du traitement du calculator " << myrank << endl;
                 
-                //REVIEWWWWWWWWWWWWWWWWWWWWWWWWWWW
+                // TODO: review and finish up
                 //MPI_Send(&compteur, 1, MPI_INT, 0, 0,parent );
-                cout << "Envoi 0 du calculator " << myrank <<endl;
+                // cout << "Envoi 0 du calculator " << myrank <<endl;
             }
         }
     }
@@ -201,6 +213,7 @@ int main(int argc, char *argv[])
 		// MPI_Send(&compteur, 1, MPI_INT, 0, 0, parent);
 		// printf("Child %d : %s : Sending to parent!\n", myrank, prog_name.c_str());
         wait_for_int_from_coordinator();
+        mpi_debug(prog_name, myrank, parent, "Message de fin");
 	}
         
 

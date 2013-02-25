@@ -13,11 +13,18 @@ using namespace std;
 void wait_init_phase_ended_message()
 {
     int message;
+    int myrank;
     MPI_Status status;
     MPI_Comm parent;
-    MPI_Comm_get_parent(&parent);
 
+    MPI_Comm_get_parent(&parent);
+	MPI_Comm_rank(MPI_COMM_WORLD, &myrank);
+    mpi_debug(prog_name, myrank, parent, "wait_init_phase_ended_message begin");
+
+    mpi_debug(prog_name, myrank, parent, "wait_init_phase_ended_message MPI_Recv begin");
     MPI_Recv(&message, 1, MPI_INT, 0, 0, parent, &status);
+    mpi_debug(prog_name, myrank, parent, "wait_init_phase_ended_message MPI_Recv end");
+
     if (message == INIT_PHASE_ENDED)
     {
         cout << "wait_init_phase_ended_message: INIT_PHASE_ENDED" << endl;
@@ -26,6 +33,7 @@ void wait_init_phase_ended_message()
     {
         cout << "wait_init_phase_ended_message: Unexpected message: " << message << endl;
     }
+    mpi_debug(prog_name, myrank, parent, "wait_init_phase_ended_message end");
 }
 
 /**
@@ -117,9 +125,15 @@ float compute_mean_temperature(vector<float> temperatures_array)
 // TODO: perhaps we could use MPI_Bcast
 void send_message_to_calculators(void* buffer, const int count, const MPI_Datatype datatype)
 {
+    MPI_Comm parent;
+    int myrank;
+	MPI_Comm_get_parent(&parent);
+	MPI_Comm_rank(MPI_COMM_WORLD, &myrank);
+    mpi_debug(prog_name, myrank, parent, "send_message_to_calculators");
+
     for(int id=calculator_slave_id; id<calculator_slave_count; id++)
     {
-		MPI_Send(buffer, count, datatype, id, 0, MPI_COMM_WORLD);
+        MPI_Send(buffer, count, datatype, id, 0, MPI_COMM_WORLD);
     }
 }
 
@@ -134,9 +148,10 @@ void send_message_to_calculators(void* buffer, const int count, const MPI_Dataty
 void start_simulation(int simulation_step) // TODO: give relevant name
 {
     // recv_from_all_calc(); // TODO
-
     // sends simulation step to calculators
     send_message_to_calculators(&simulation_step, 1, MPI_INT);
+
+
 
     // receive all calculators temperature and computes the mean temperature
     vector<float> temperatures_array = receive_all_new_temperatures();
@@ -157,32 +172,36 @@ void start_simulation(int simulation_step) // TODO: give relevant name
 
 int main(int argc, char *argv[])
 {
-	prog_name = argv[0];
-	int myrank;
-	int message;
-	MPI_Comm parent;
-	MPI_Status status;
+    prog_name = argv[0];
+    int myrank;
+    int message;
+    MPI_Comm parent;
+    MPI_Status status;
 
-	MPI_Init(&argc, &argv);
+    MPI_Init(&argc, &argv);
 
-	MPI_Comm_get_parent(&parent);
-	MPI_Comm_rank(MPI_COMM_WORLD, &myrank);
+    MPI_Comm_get_parent(&parent);
+    MPI_Comm_rank(MPI_COMM_WORLD, &myrank);
 
-	mpi_debug(prog_name, myrank, parent, "Coordinator created");
-	if (parent != MPI_COMM_NULL)
-	{
-		// the master sends the coordinator the init phase ended so the coordinator can start its work
+    mpi_debug(prog_name, myrank, parent, "Coordinator created");
+    if (parent != MPI_COMM_NULL)
+    {
+        // the master sends the coordinator the init phase ended so the coordinator can start its work
         wait_init_phase_ended_message();
 
         // recv_from_all_calc(); // TODO
 
         // "toc" de simulation
         start_simulation(0);
-
         send_simulation_phase_ended_message();
-	}
 
-	MPI_Finalize();
-	return 0;
+    }
+    else
+    {
+        mpi_debug(prog_name, myrank, parent, "wait_init_phase_ended_message oops");
+    }
+
+    MPI_Finalize();
+    return 0;
 }
 #endif /* CALCULATOR_SLAVE_H_ */
