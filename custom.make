@@ -12,33 +12,26 @@ all: program
 
 directories: ${OUT_DIR}
 
-
 ${OUT_DIR}:
 	${MKDIR_P} ${OUT_DIR}
 
-program: master calculator_slave coordinator_slave
+program: master coordinator_slave calculator_slave
 
 # master
-master: master.cpp master.h utils.o
-	$(CC) $(LDFLAGS) -o $@ $^
-
-
-# calculator_slave
-calculator_slave: calculator_slave.o utils.o
-	$(CC) $(LDFLAGS) -o $@ $^
-
-calculator_slave.o: calculator_slave.cpp calculator_slave.h
-	$(CC) $(CFLAGS) -c -o $@ $<
+master: master.h master.cpp utils.o
+	$(CC) $(CFLAGS) -o $@ $^
 
 # coordinator_slave
-coordinator_slave: coordinator_slave.o utils.o
-	$(CC) $(LDFLAGS) -o $@ $^
+coordinator_slave: coordinator_slave.h coordinator_slave.cpp utils.o
+	$(CC) $(CFLAGS) -o $@ $^
 
-coordinator_slave.o: coordinator_slave.cpp coordinator_slave.h
-	$(CC) $(CFLAGS) -c -o $@ $<
+# calculator_slave
+calculator_slave: calculator_slave.h calculator_slave.cpp utils.o
+	$(CC) $(CFLAGS) -o $@ $^
 
 utils.o: utils.cpp utils.h
 	$(CC) $(CFLAGS) -c -o $@ $<
+	@# $(CC) $(CFLAGS) -c -o $@ $^
 
 clean:
 	rm -f *.o
