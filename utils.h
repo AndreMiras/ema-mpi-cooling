@@ -8,6 +8,8 @@
 
 using namespace std;
 
+static vector<vector<int> > calculators_ids_matrix; // TODO[deprecated]: should later be computed dynamically
+
 static const int coordinator_slave_id = 0; // l'id du coordinateur
 static const int calculator_slave_first_id = 1; // les id esclaves demarrent a 1
 
@@ -100,4 +102,27 @@ std::string t_to_string(T i)
 
     return s;
 }
+
+float get_temperature(
+        const vector<vector<int> >& calculators_ids_matrix,
+        const vector<vector<float> >& temperature_matrix,
+        int calculator_number);
+
+/*
+ * Given a calculators ids start from 1 and are continuous,
+ * returns its row and col position in the matrix (or -1 if not found)
+ * calculator_number = 5
+ * matrix = {
+ *      {1, 2, 3, 4},
+ *      {5, 6, 7, 8},
+ *      {9,10,11,12},
+ * }
+ * returns: row = 1 & col = 0
+ */
+void get_calculator_row_col(
+        const int calculator_number,
+        const int matrix_row_size,
+        const int matrix_col_size,
+        int& row,
+        int& col);
 #endif /* UTILS_H_ */

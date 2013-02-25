@@ -252,38 +252,6 @@ void get_neighbours_array_from_matrix(
 		matrix, matrix_row_size, matrix_col_size, row, col);
 }
 
-/*
- * Given a calculator number, returns its row and col in the matrix (or -1 if not found)
- * calculator_number = 5
- * matrix = {
- *      {1, 2, 3, 4},
- *      {5, 6, 7, 8},
- *      {9,10,11,12},
- * }
- * returns: row = 1 & col = 0
- */
-void get_calculator_row_col(
-	const int calculator_number,
-	vector<vector<int> > matrix,
-	const int matrix_row_size,
-	const int matrix_col_size,
-	int& row,
-	int& col)
-{
-	bool calculator_row_col_found = false;
-	row = matrix_row_size;
-	while (row >= 0 && !calculator_row_col_found)
-	{
-		col = matrix_col_size;
-		row--;
-		while (col >= 0 && !calculator_row_col_found)
-		{
-			col--;
-			calculator_row_col_found = (matrix[row][col] == calculator_number);
-		}
-	}
-}
-
 void init_neighbours_array(int neighbours_array[], int neighbours_array_size)
 {
 	for (int i=0; i < neighbours_array_size; i++)
@@ -311,7 +279,7 @@ void init_temperature_matrix(vector<vector<float> >& matrix, const int matrix_ro
 	}
 }
 
-void init_processes_matrix(vector<vector<int> >& matrix, const int matrix_row_size, const int matrix_col_size)
+void init_calculators_ids_matrix(vector<vector<int> >& matrix, const int matrix_row_size, const int matrix_col_size)
 {
 	vector<int> array;
 	int calculator_num = calculator_slave_first_id;
@@ -348,26 +316,6 @@ float get_initial_temperature(int process)
 
 	return initial_temperature;
 }
-
-
-float get_temperature(int calculator_number)
-{
-    int row;
-    int col;
-    float temperature;
-
-    get_calculator_row_col(
-        calculator_number,
-        processes_matrix,
-        processes_matrix.size(),
-        processes_matrix.at(0).size(),
-        row,
-        col);
-    temperature = temperature_matrix.at(row).at(col);
-
-    return temperature;
-}
-
 
 void send_init_phase_ended_message(const MPI_Comm& intercomm)
 {
@@ -452,7 +400,7 @@ MPI_Comm create_coordinator_slave_and_calculators_slaves()
 		// le pointeur vers l'espace de comm entre le groupe de départ et le groupe nouvellement créé (contenant les nouveaux processus)
 		&intercomm,
 		// un tableau d'entier pour stocker les codes de retour de chaque processus
-		errcodes
+		errcodes // TODO: check the exit codes to see if everythings went OK
 	);
 
     mpi_debug(prog_name, myrank, parent, "Parent: I ran all instances.");
@@ -468,18 +416,18 @@ void neighbour_array_creation_and_passing(const MPI_Comm& intercomm)
 	int neighbours_array[neighbours_array_size]; // neighbours array to be sent
 
 	init_temperature_matrix(temperature_matrix, matrix_row_size, matrix_col_size);
-	init_processes_matrix(processes_matrix, matrix_row_size, matrix_col_size);
-	cout << "processes_matrix[" << processes_matrix.size() << "][" << processes_matrix[0].size() << "] = ";
-	display_matrix<int>(processes_matrix);
+	init_calculators_ids_matrix(calculators_ids_matrix, matrix_row_size, matrix_col_size);
+	cout << "calculators_ids_matrix[" << calculators_ids_matrix.size() << "][" << calculators_ids_matrix[0].size() << "] = ";
+	display_matrix<int>(calculators_ids_matrix);
 	cout << "temperature_matrix[" << temperature_matrix.size() << "][" << temperature_matrix[0].size() << "] = ";
 	display_matrix<float>(temperature_matrix);
 	int calculator_row, calculator_col;
 	// on ne communique qu'avec les calculateurs (le coordinateur a l'id 0)
 	for (int dest = calculator_slave_first_id; dest <= calculator_slave_last_id; dest++)
 	{
-		get_calculator_row_col(dest, processes_matrix, matrix_row_size, matrix_col_size, calculator_row, calculator_col);
+		get_calculator_row_col(dest, matrix_row_size, matrix_col_size, calculator_row, calculator_col);
 		get_neighbours_array_from_matrix(
-				processes_matrix,
+				calculators_ids_matrix,
 				matrix_row_size,
 				matrix_col_size,
 				calculator_row,
@@ -496,7 +444,7 @@ void neighbour_array_creation_and_passing(const MPI_Comm& intercomm)
 		// Sets neighbours_array and initial_temperature
 		calculator_init calculator_init1;
 		memcpy(calculator_init1.neighbours_array, neighbours_array, neighbours_array_size * sizeof(int));
-		calculator_init1.initial_temperature = get_temperature(dest);
+		calculator_init1.initial_temperature = get_temperature(calculators_ids_matrix, temperature_matrix, dest);
         /*
         string temperature_str = t_to_string(calculator_init1.initial_temperature);
         string message = "calculator_init1.initial_temperature = " + temperature_str;

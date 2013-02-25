@@ -12,7 +12,6 @@ int myrank;
 MPI_Comm parent;
 
 vector<vector<float> > temperature_matrix;
-vector<vector<int> > processes_matrix;
 
 
 float get_initial_temperature(int process);

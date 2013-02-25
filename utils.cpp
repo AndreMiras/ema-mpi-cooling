@@ -38,3 +38,42 @@ void mpi_debug(const string& prog_name, const int& rank, const MPI_Comm& parent,
             // ", parent: " << parent_str <<
             ", message: " << message << endl;
 }
+
+
+// TODO[deprecated]: calculators_ids_matrix should later be computed dynamically
+float get_temperature(
+        const vector<vector<int> >& calculators_ids_matrix,
+        const vector<vector<float> >& temperature_matrix,
+        int calculator_number)
+{
+    int row;
+    int col;
+    float temperature;
+
+    get_calculator_row_col(
+            calculator_number,
+            temperature_matrix.size(),
+            temperature_matrix.at(0).size(),
+            row,
+            col);
+    temperature = temperature_matrix.at(row).at(col);
+
+    return temperature;
+}
+
+void get_calculator_row_col(
+        const int calculator_number,
+        const int matrix_row_size,
+        const int matrix_col_size,
+        int& row,
+        int& col)
+{
+    row = -1;
+    col = -1;
+    if ((matrix_row_size * matrix_col_size) >= calculator_number)
+    {
+        row = ((calculator_number - 1) / (matrix_col_size));
+        col = ((calculator_number - 1) % (matrix_col_size));
+    }
+}
+
