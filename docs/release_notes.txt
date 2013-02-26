@@ -1,5 +1,10 @@
 = Release Notes =
 
+== version 4.0 ==
+	- slaves calculators temperature exchanges and mean calculation
+	- slave coordinator mean calculation and calculators coordination
+	- stops simulation when temperature delta < epsilon
+
 == version 3.0 ==
 	- passing neighbours array to slaves
 	- coordinator start and creation
