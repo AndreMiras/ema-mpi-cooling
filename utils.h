@@ -1,10 +1,11 @@
 #ifndef UTILS_H_
 #define UTILS_H_
+#include <mpi.h>
 #include <vector>
 #include <string>
 #include <sstream>
+#include <iomanip>
 #include <iostream>
-#include <mpi.h>
 
 using namespace std;
 
@@ -57,12 +58,10 @@ void create_mpi_calculator_init_type(MPI_Datatype& mpi_calculator_init_type);
 template <class T>
 void display_array(const T array[], const int array_size)
 {
-	// cout << "array[" << array_size << "] = ";
 	cout << "{ ";
 	for(int i=0; i<array_size; i++)
 	{
-		// printf("array[%i]: %i\n", i, array[i]);
-		cout << array[i];
+		cout << setw(7) << array[i];
 		if (i != (array_size -1))
 		{
 			cout << ", ";

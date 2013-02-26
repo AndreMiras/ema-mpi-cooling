@@ -326,8 +326,10 @@ void send_init_phase_ended_message(const MPI_Comm& intercomm)
     MPI_Comm_rank(MPI_COMM_WORLD, &myrank);
 
     string code_str = t_to_string(INIT_PHASE_ENDED);
+    /*
     string message = "send_init_phase_ended_message: INIT_PHASE_ENDED: " + code_str;
     mpi_debug(prog_name, myrank, parent, message);
+    */
     MPI_Send(&code, 1, MPI_INT, coordinator_slave_id, tag, intercomm);
 }
 
@@ -417,9 +419,9 @@ void neighbour_array_creation_and_passing(const MPI_Comm& intercomm)
 
 	init_initial_temperature_matrix(initial_temperature_matrix, matrix_row_size, matrix_col_size);
 	init_calculators_ids_matrix(calculators_ids_matrix, matrix_row_size, matrix_col_size);
-	cout << "calculators_ids_matrix[" << calculators_ids_matrix.size() << "][" << calculators_ids_matrix[0].size() << "] = ";
-	display_matrix<int>(calculators_ids_matrix);
-	cout << "initial_temperature_matrix[" << initial_temperature_matrix.size() << "][" << initial_temperature_matrix[0].size() << "] = ";
+	// cout << "calculators_ids_matrix[" << calculators_ids_matrix.size() << "][" << calculators_ids_matrix[0].size() << "] = ";
+	// display_matrix<int>(calculators_ids_matrix);
+	// cout << "initial_temperature_matrix[" << initial_temperature_matrix.size() << "][" << initial_temperature_matrix[0].size() << "] = ";
 	display_matrix<float>(initial_temperature_matrix);
 	int calculator_row, calculator_col;
 	// on ne communique qu'avec les calculateurs (le coordinateur a l'id 0)

@@ -11,7 +11,7 @@ int myrank;
 MPI_Comm parent;
 vector<vector<float> > temperature_matrix;
 
-const float epsilon = 1.5;
+const float epsilon = 0.1;
 
 void send_message_to_calculators(void* buffer, int count, MPI_Datatype datatype);
 

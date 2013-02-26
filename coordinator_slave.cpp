@@ -2,6 +2,7 @@
 #define CALCULATOR_SLAVE_H_
 #include "coordinator_slave.h"
 #include "utils.h"
+#include <cmath>
 #include <stdio.h>
 #include <stdlib.h>
 #include <iostream>
@@ -75,16 +76,10 @@ vector<float> receive_all_new_temperatures()
 	MPI_Status status;
     vector<float> temperatures_array;
 
-    mpi_debug(prog_name, myrank, parent, "receive_all_new_temperatures");
     // TODO: perhaps we could use MPI_Gather
     for(int calculator_id = calculator_slave_first_id; calculator_id <= calculator_slave_last_id; calculator_id++)
     {
-        message = "receive_all_new_temperatures: Receiving one temperature from: " + t_to_string(calculator_id);
-        mpi_debug(prog_name, myrank, parent, message);
-        mpi_debug(prog_name, myrank, parent, "MPI_Recv begin");
         MPI_Recv(&temperature, 1, MPI_FLOAT, calculator_id, 0, MPI_COMM_WORLD, &status);
-        message = "MPI_Recv end, Received one temperature from: " + t_to_string(calculator_id) + " end";
-        mpi_debug(prog_name, myrank, parent, message);
         temperatures_array.push_back(temperature);
 
         // updates the temperature_matrix
@@ -93,7 +88,6 @@ vector<float> receive_all_new_temperatures()
 
 
     }
-    mpi_debug(prog_name, myrank, parent, "receive_all_new_temperatures end");
     // display_array(temperatures_array);
     display_matrix(temperature_matrix);
 
@@ -118,8 +112,6 @@ float compute_mean_temperature(vector<float> temperatures_array)
 // TODO: perhaps we could use MPI_Bcast
 void send_message_to_calculators(void* buffer, const int count, const MPI_Datatype datatype)
 {
-    mpi_debug(prog_name, myrank, parent, "send_message_to_calculators");
-
     for(int id = calculator_slave_first_id; id <= calculator_slave_last_id; id++)
     {
         MPI_Send(buffer, count, datatype, id, 0, MPI_COMM_WORLD);
@@ -151,10 +143,12 @@ void start_simulation(int simulation_step) // TODO: give relevant name
         simulation_step++;
         start_simulation(simulation_step);
     }
+    /*
     else
     {
         mpi_debug(prog_name, myrank, parent, "delta_temperature > epsilon");
     }
+    */
 }
 
 void init_temperature_matrix()
@@ -178,12 +172,11 @@ int main(int argc, char *argv[])
     MPI_Comm_get_parent(&parent);
     MPI_Comm_rank(MPI_COMM_WORLD, &myrank);
 
-    mpi_debug(prog_name, myrank, parent, "Coordinator created");
     if (parent != MPI_COMM_NULL)
     {
         // the master sends the coordinator the init phase ended so the coordinator can start its work
         wait_init_phase_ended_message();
-    init_temperature_matrix();
+        init_temperature_matrix();
 
         // recv_from_all_calc(); // TODO
 
@@ -192,9 +185,7 @@ int main(int argc, char *argv[])
         send_simulation_phase_ended_message();
     }
 
-    mpi_debug(prog_name, myrank, parent, "MPI_Finalizing");
     MPI_Finalize();
-    mpi_debug(prog_name, myrank, parent, "MPI_Finalized");
     return 0;
 }
 #endif /* CALCULATOR_SLAVE_H_ */
