@@ -20,6 +20,9 @@ float previous_mean_temperature = current_temperature;
 
 const float epsilon = 0.1;
 
+/**
+ * Sends message to all calculators helper function
+ */
 void send_message_to_calculators(void* buffer, int count, MPI_Datatype datatype);
 
 /**
@@ -38,7 +41,17 @@ void send_simulation_phase_ended_message();
 void wait_init_phase_ended_message();
 
 /**
- * Init empty temperature matrix with correct dimensions
+ * Inits empty temperature matrix with correct dimensions
  */
 void init_temperature_matrix();
+
+/*
+ * Le processus coordinateur fonctionne de la manière suivante
+ * envoie le numéro du pas à tous les calculateurs
+ * attends de recevoir toutes les nouvelles températures
+ * calcule l’écart “Delta Tmoy”
+ * “Delta Tmoy” = “Tmoy_courant” - “Tmoy_new”
+ * si “Delta Tmoy” >= Epsilon on recommence, sinon on envoie un message de fin aux calculateurs
+ */
+void start_simulation(int simulation_step);
 #endif /* COORDINATOR_SLAVE_H_ */

@@ -75,14 +75,6 @@ void send_message_to_calculators(void* buffer, const int count, const MPI_Dataty
     }
 }
 
-/*
- * Le processus coordinateur fonctionne de la manière suivante
- * envoie le numéro du pas à tous les calculateurs
- * attends de recevoir toutes les nouvelles températures
- * calcule l’écart “Delta Tmoy”
- * “Delta Tmoy” = “Tmoy_courant” - “Tmoy_new”
- * si “Delta Tmoy” >= Epsilon on recommence, sinon on envoie un message de fin aux calculateurs
- */
 void start_simulation(int simulation_step)
 {
     string message = "start_simulation simulation_step: " + t_to_string(simulation_step);
@@ -119,6 +111,11 @@ void init_temperature_matrix()
     }
 }
 
+/**
+ * - waits for end of init phase from master
+ * - starts the simulation
+ * - sends end of simulation message
+ */
 int main(int argc, char *argv[])
 {
     prog_name = argv[0];

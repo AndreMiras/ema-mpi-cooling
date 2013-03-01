@@ -476,7 +476,6 @@ int main(int argc, char *argv[])
 
     mpi_debug(prog_name, myrank, parent, "Master end");
 
-    // TODO: don't we do a MPI_Comm_free?
 	MPI_Finalize();
 	return 0;
 }
