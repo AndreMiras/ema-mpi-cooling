@@ -76,19 +76,6 @@ vector<float> receive_temperatures_from_neighbours()
     return temperatures;
 }
 
-float compute_new_temperature_mean(const vector<float>& temperatures)
-{
-    float temperature = my_temperature;
-
-    for(int i=0; i < temperatures.size(); i++)
-    {
-        temperature += temperatures.at(i);
-    }
-    temperature = (temperature / (temperatures.size() + 1));
-    
-    return temperature;
-}
-
 void send_new_temperature_to_coordinator(float new_temperature)
 {
     MPI_Send(&new_temperature, 1, MPI_FLOAT, coordinator_slave_id, 0, MPI_COMM_WORLD);
@@ -97,19 +84,18 @@ void send_new_temperature_to_coordinator(float new_temperature)
 
 void temperatures_exchange()
 {
-    // Envoi temperature aux voisins
+    // Sends temperature to neigbours
     send_temperature_to_neighbours();
 
-    // Recevoir temperature des voisins
+    // Receives neighbours temperature
     vector<float> temperatures = receive_temperatures_from_neighbours();
 
-    // Calculer la nouvelle temperature
-    float new_temperature;
-    new_temperature = compute_new_temperature_mean(temperatures);
-    my_temperature = new_temperature;
+    // Computes the new mean
+    temperatures.push_back(my_temperature);
+    my_temperature = compute_mean(temperatures);
 
-    // Envoi nouvelle temperature au coordinateur
-    send_new_temperature_to_coordinator(new_temperature);
+    // Sends new temperature to coordinator
+    send_new_temperature_to_coordinator(my_temperature);
 }
 
 int receive_simulation_step()

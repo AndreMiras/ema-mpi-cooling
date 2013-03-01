@@ -26,9 +26,6 @@ void wait_init_phase_ended_message()
     }
 }
 
-/**
- * sends SIMULATION_PHASE_ENDED message to master and calculators
- */
 void send_simulation_phase_ended_message()
 {
     int message = SIMULATION_PHASE_ENDED;
@@ -69,21 +66,6 @@ vector<float> receive_all_new_temperatures()
     return temperatures_array;
 }
 
-float compute_mean_temperature(vector<float> temperatures_array)
-{
-    float mean_temperature;
-    int temperatures_array_size = temperatures_array.size();
-
-    for(int i=0; i < temperatures_array_size; i++)
-    {
-        mean_temperature += temperatures_array.at(i);
-    }
-    mean_temperature = mean_temperature / temperatures_array_size;
-
-    return mean_temperature;
-}
-
-
 // TODO: perhaps we could use MPI_Bcast
 void send_message_to_calculators(void* buffer, const int count, const MPI_Datatype datatype)
 {
@@ -110,7 +92,7 @@ void start_simulation(int simulation_step)
 
     // receive all calculators temperature and computes the mean temperature
     vector<float> temperatures_array = receive_all_new_temperatures();
-    float mean_temperature = compute_mean_temperature(temperatures_array);
+    float mean_temperature = compute_mean(temperatures_array);
 
     float delta_temperature = abs(mean_temperature - previous_mean_temperature);
     if (delta_temperature > epsilon)

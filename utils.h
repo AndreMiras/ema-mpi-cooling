@@ -133,4 +133,10 @@ void get_calculator_row_col(
         const int matrix_col_size,
         int& row,
         int& col);
+
+/**
+ * Computes te mean of a given list of values
+ */
+float compute_mean(const vector<float>& values);
+
 #endif /* UTILS_H_ */

@@ -81,3 +81,17 @@ void get_calculator_row_col(
     }
 }
 
+float compute_mean(const vector<float>& values)
+{
+    float mean = 0;
+    int values_count = values.size();
+
+    for(int i=0; i < values_count; i++)
+    {
+        mean += values.at(i);
+    }
+    mean = mean / values_count;
+
+    return mean;
+}
+

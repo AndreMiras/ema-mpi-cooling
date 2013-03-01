@@ -29,11 +29,6 @@ int receive_simulation_step();
 void send_new_temperature_to_coordinator(float new_temperature);
 
 /**
- * Computes the mean of a given temperature matrix
- */
-float compute_new_temperature_mean(const vector<float>& temperatures);
-
-/**
  * Sends temperature to neighbours asynchroniously.
  * Receives neighbours' temperatures.
  */
