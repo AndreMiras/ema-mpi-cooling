@@ -7,6 +7,29 @@
 #define EAST			 1
 #define WEST			-1
 
+int get_neighbour_from_matrix(
+	vector<vector<int> > matrix,
+	int matrix_row_size,
+	int matrix_col_size,
+	int row,
+	int col,
+    int north_or_south,
+    int east_or_west)
+{
+	int neighbour = NO_NEIGHBOUR_VALUE;
+	int neighbour_row = row + north_or_south;
+	int neighbour_col = col + east_or_west;
+
+	// verifies row and col couple are correct
+	if((neighbour_row >= 0 && neighbour_row < matrix_row_size)
+	&& (neighbour_col >= 0 && neighbour_col < matrix_col_size))
+	{
+		neighbour = matrix[neighbour_row][neighbour_col];
+	}
+
+	return neighbour;
+}
+
 /*
  * Given a matrix and a row, col couple, returns the north neighbour
  * matrix = {
@@ -24,18 +47,17 @@ int get_north_neighbour_from_matrix(
 	int row,
 	int col)
 {
-	int neighbour = NO_NEIGHBOUR_VALUE;
-	int neighbour_row = row + NORTH;
-	int neighbour_col = col;
+    int north_or_south = NORTH;
+    int east_or_west = 0;
 
-	// verifies row and col couple are correct
-	if((neighbour_row >= 0 && neighbour_row < matrix_row_size)
-	&& (neighbour_col >= 0 && neighbour_col < matrix_col_size))
-	{
-		neighbour = matrix[neighbour_row][neighbour_col];
-	}
-
-	return neighbour;
+    return get_neighbour_from_matrix(
+            matrix,
+            matrix_row_size,
+            matrix_col_size,
+            row,
+            col,
+            north_or_south,
+            east_or_west);
 }
 
 
@@ -49,18 +71,17 @@ int get_north_east_neighbour_from_matrix(
 	int row,
 	int col)
 {
-	int neighbour = NO_NEIGHBOUR_VALUE;
-	int neighbour_row = row + NORTH;
-	int neighbour_col = col + EAST;
+    int north_or_south = NORTH;
+    int east_or_west = EAST;
 
-	// verifies row and col couple are correct
-	if((neighbour_row >= 0 && neighbour_row < matrix_row_size)
-	&& (neighbour_col >= 0 && neighbour_col < matrix_col_size))
-	{
-		neighbour = matrix[neighbour_row][neighbour_col];
-	}
-
-	return neighbour;
+    return get_neighbour_from_matrix(
+            matrix,
+            matrix_row_size,
+            matrix_col_size,
+            row,
+            col,
+            north_or_south,
+            east_or_west);
 }
 
 
@@ -74,18 +95,17 @@ int get_east_neighbour_from_matrix(
 	int row,
 	int col)
 {
-	int neighbour = NO_NEIGHBOUR_VALUE;
-	int neighbour_row = row;
-	int neighbour_col = col + EAST;
+    int north_or_south = 0;
+    int east_or_west = EAST;
 
-	// verifies row and col couple are correct
-	if((neighbour_row >= 0 && neighbour_row < matrix_row_size)
-	&& (neighbour_col >= 0 && neighbour_col < matrix_col_size))
-	{
-		neighbour = matrix[neighbour_row][neighbour_col];
-	}
-
-	return neighbour;
+    return get_neighbour_from_matrix(
+            matrix,
+            matrix_row_size,
+            matrix_col_size,
+            row,
+            col,
+            north_or_south,
+            east_or_west);
 }
 
 
@@ -99,18 +119,17 @@ int get_south_east_neighbour_from_matrix(
 	int row,
 	int col)
 {
-	int neighbour = NO_NEIGHBOUR_VALUE;
-	int neighbour_row = row + SOUTH;
-	int neighbour_col = col + EAST;
+    int north_or_south = SOUTH;
+    int east_or_west = EAST;
 
-	// verifies row and col couple are correct
-	if((neighbour_row >= 0 && neighbour_row < matrix_row_size)
-	&& (neighbour_col >= 0 && neighbour_col < matrix_col_size))
-	{
-		neighbour = matrix[neighbour_row][neighbour_col];
-	}
-
-	return neighbour;
+    return get_neighbour_from_matrix(
+            matrix,
+            matrix_row_size,
+            matrix_col_size,
+            row,
+            col,
+            north_or_south,
+            east_or_west);
 }
 
 
@@ -124,18 +143,17 @@ int get_south_neighbour_from_matrix(
 	int row,
 	int col)
 {
-	int neighbour = NO_NEIGHBOUR_VALUE;
-	int neighbour_row = row + SOUTH;
-	int neighbour_col = col;
+    int north_or_south = SOUTH;
+    int east_or_west = 0;
 
-	// verifies row and col couple are correct
-	if((neighbour_row >= 0 && neighbour_row < matrix_row_size)
-	&& (neighbour_col >= 0 && neighbour_col < matrix_col_size))
-	{
-		neighbour = matrix[neighbour_row][neighbour_col];
-	}
-
-	return neighbour;
+    return get_neighbour_from_matrix(
+            matrix,
+            matrix_row_size,
+            matrix_col_size,
+            row,
+            col,
+            north_or_south,
+            east_or_west);
 }
 
 
@@ -149,18 +167,17 @@ int get_south_west_neighbour_from_matrix(
 	int row,
 	int col)
 {
-	int neighbour = NO_NEIGHBOUR_VALUE;
-	int neighbour_row = row + SOUTH;
-	int neighbour_col = col + WEST;
+    int north_or_south = SOUTH;
+    int east_or_west = WEST;
 
-	// verifies row and col couple are correct
-	if((neighbour_row >= 0 && neighbour_row < matrix_row_size)
-	&& (neighbour_col >= 0 && neighbour_col < matrix_col_size))
-	{
-		neighbour = matrix[neighbour_row][neighbour_col];
-	}
-
-	return neighbour;
+    return get_neighbour_from_matrix(
+            matrix,
+            matrix_row_size,
+            matrix_col_size,
+            row,
+            col,
+            north_or_south,
+            east_or_west);
 }
 
 
@@ -174,18 +191,17 @@ int get_west_neighbour_from_matrix(
 	int row,
 	int col)
 {
-	int neighbour = NO_NEIGHBOUR_VALUE;
-	int neighbour_row = row;
-	int neighbour_col = col + WEST;
+    int north_or_south = 0;
+    int east_or_west = WEST;
 
-	// verifies row and col couple are correct
-	if((neighbour_row >= 0 && neighbour_row < matrix_row_size)
-	&& (neighbour_col >= 0 && neighbour_col < matrix_col_size))
-	{
-		neighbour = matrix[neighbour_row][neighbour_col];
-	}
-
-	return neighbour;
+    return get_neighbour_from_matrix(
+            matrix,
+            matrix_row_size,
+            matrix_col_size,
+            row,
+            col,
+            north_or_south,
+            east_or_west);
 }
 
 
@@ -199,18 +215,17 @@ int get_north_west_neighbour_from_matrix(
 	int row,
 	int col)
 {
-	int neighbour = NO_NEIGHBOUR_VALUE;
-	int neighbour_row = row + NORTH;
-	int neighbour_col = col + WEST;
+    int north_or_south = NORTH;
+    int east_or_west = WEST;
 
-	// verifies row and col couple are correct
-	if((neighbour_row >= 0 && neighbour_row < matrix_row_size)
-	&& (neighbour_col >= 0 && neighbour_col < matrix_col_size))
-	{
-		neighbour = matrix[neighbour_row][neighbour_col];
-	}
-
-	return neighbour;
+    return get_neighbour_from_matrix(
+            matrix,
+            matrix_row_size,
+            matrix_col_size,
+            row,
+            col,
+            north_or_south,
+            east_or_west);
 }
 
 
