@@ -1,9 +1,10 @@
 = README =
 
 == Build ==
-make -f custom.make
-or
-./build.sh
+make
+
+== Clean ==
+make clean
 
 == Run ==
 mpirun -np 1 master
