@@ -276,23 +276,6 @@ void init_initial_temperature_matrix(vector<vector<float> >& matrix, const int m
 	}
 }
 
-void init_calculators_ids_matrix(vector<vector<int> >& matrix, const int matrix_row_size, const int matrix_col_size)
-{
-	vector<int> array;
-	int calculator_num = calculator_slave_first_id;
-
-	for (int row=0; row < matrix_row_size; row++)
-	{
-		array.clear();
-		for (int col=0; col < matrix_col_size; col++)
-		{
-			array.push_back(calculator_num);
-			calculator_num++;
-		}
-		matrix.push_back(array);
-	}
-}
-
 /*
  * Phase 3: un float correspondant à la temperature initiale du carré (fixée en dur, puis lue dans un fichier de config)
  * TODO: donner une temperature aléatoire
@@ -415,7 +398,6 @@ void neighbour_array_creation_and_passing(const MPI_Comm& intercomm)
 	int neighbours_array[neighbours_array_size]; // neighbours array to be sent
 
 	init_initial_temperature_matrix(initial_temperature_matrix, matrix_row_size, matrix_col_size);
-	init_calculators_ids_matrix(calculators_ids_matrix, matrix_row_size, matrix_col_size);
 	display_matrix<float>(initial_temperature_matrix);
 	int calculator_row, calculator_col;
 	// on ne communique qu'avec les calculateurs (le coordinateur a l'id 0)

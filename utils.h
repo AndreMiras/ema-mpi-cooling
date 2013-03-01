@@ -9,10 +9,8 @@
 
 using namespace std;
 
-static vector<vector<int> > calculators_ids_matrix; // TODO[deprecated]: should later be computed dynamically
-
-static const int coordinator_slave_id = 0; // l'id du coordinateur
-static const int calculator_slave_first_id = 1; // les id esclaves demarrent a 1
+static const int coordinator_slave_id = 0; // coordinateur id
+static const int calculator_slave_first_id = 1; // id slaves ids start at 1
 
 // Matrix plate dimension
 static const int matrix_row_size = 3;
@@ -45,33 +43,10 @@ typedef struct calculator_init_s {
 	float initial_temperature;
 } calculator_init;
 
-/*
-enum message_type {
-	INIT_PHASE_ENDED = 0,
-	SIMULATION_PHASE_ENDED,
-};
-*/
 static const int SIMULATION_PHASE_ENDED = -1;
 static const int INIT_PHASE_ENDED = 0;
 
 void create_mpi_calculator_init_type(MPI_Datatype& mpi_calculator_init_type);
-
-/**
- * retrieves calculator id from given matrix dimension and row/col couple
- * e.g. given the following matrix dimension:
- * matrix_row_size = 3
- * matrix_col_size = 4
- * we would have the following matrix:
- * {
- *  {1, 2, 3, 4},
- *  {5, 6, 7, 8},
- *  {9,10,11,12},
- * }
- * row = 1 & col = 0 would return 5
- * coordinate outside the matrix would return -1
- */
-int get_calculator_id(const int matrix_row_size, const int matrix_col_size, const int row, const int col);
-
 
 template <class T>
 void display_array(const T array[], const int array_size)
@@ -122,6 +97,24 @@ std::string t_to_string(T i)
 float get_temperature(
         const vector<vector<float> >& temperature_matrix,
         int calculator_number);
+
+/**
+ * retrieves calculator id from given matrix dimension and row/col couple
+ * e.g. given the following matrix dimension:
+ * matrix_row_size = 3
+ * matrix_col_size = 4
+ * we would have the following matrix:
+ * {
+ *  {1, 2, 3, 4},
+ *  {5, 6, 7, 8},
+ *  {9,10,11,12},
+ * }
+ * row = 1 & col = 0 would return 5
+ * coordinate outside the matrix would return -1
+ */
+int get_calculator_id(const int matrix_row_size, const int matrix_col_size, const int row, const int col);
+
+
 
 /*
  * Given a calculators ids start from 1 and are continuous,

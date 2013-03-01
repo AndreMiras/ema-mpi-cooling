@@ -2,7 +2,6 @@
 
 /*
  * Creates a type for struct calculator_init
- * TODO[perfs]: the MPI_Datatype object should be created once and saved statically
  */
 void create_mpi_calculator_init_type(MPI_Datatype& mpi_calculator_init_type)
 {
@@ -12,7 +11,6 @@ void create_mpi_calculator_init_type(MPI_Datatype& mpi_calculator_init_type)
 		1
 	};
 	MPI_Datatype types[nitems] = {MPI_INT, MPI_FLOAT};
-	// MPI_Datatype mpi_calculator_init_type;
 	MPI_Aint offsets[nitems];
 
 	offsets[0] = offsetof(calculator_init, neighbours_array);

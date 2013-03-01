@@ -12,15 +12,63 @@ int neighbours_array[NB_NEIGHBOURS]; // neighbours array to be received
 float my_temperature; // calculator temperature
 
 int main(int argc, char *argv[]);
+
+/**
+ * This is step 4 that starts the simulation
+ */
+void start_simulation();
+
+/**
+ * Waits for a new simulation step int
+ */
 int receive_simulation_step();
+
+/**
+ * Sends a given temperature to coordinator
+ */
 void send_new_temperature_to_coordinator(float new_temperature);
+
+/**
+ * Computes the mean of a given temperature matrix
+ */
 float compute_new_temperature_mean(const vector<float>& temperatures);
+
+/**
+ * Sends temperature to neighbours asynchroniously.
+ * Receives neighbours' temperatures.
+ */
 void temperatures_exchange();
 void wait_for_int_from_coordinator();
 double process_new_temperatures(const vector<float>& temperatures);
+
+/**
+ * Receives temperature from neighbours
+ */
 vector<float> receive_temperatures_from_neighbours();
+
+/**
+ * Sends temperature to neighbours asynchroniously
+ */
 void send_temperature_to_neighbours();
+
+/**
+ * Receveives the initial structure (step 2), containing:
+ *  - neighbours_array
+ *  - initial_temperature
+ */
 void receive_init_struct();
+
+/*
+ * Recreates a neighbours matrix from a given flat neighbours_array
+ * the given array:
+ * int neighbours_array[] = { 1, 2, 5, 8, 7, 6, 3, 0 }
+ * would return the following matrix:
+ * {
+ *  {0, 1, 2},
+ *  {3, x, 5},
+ *  {6, 7, 8}
+ * }
+ */
 void create_matrix_from_neighbours_array(const int neighbours_array[], const int array_size, const int myrank, vector<vector<int> >& matrix);
 
 

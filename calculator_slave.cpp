@@ -14,13 +14,6 @@ enum {
 	NORTH_WEST_INDEX,
 };
 
-/*
- * Recreates a neighbours matrix from a given flat neighbours_array
- * 1 2 5 8 7 6 3 0
- * 0       1       2
- * 3       4       5
- * 6       7       8
- */
 void create_matrix_from_neighbours_array(const int neighbours_array[], const int array_size, const int myrank, vector<vector<int> >& matrix)
 {
 	vector<int> array_vector;
@@ -42,11 +35,6 @@ void create_matrix_from_neighbours_array(const int neighbours_array[], const int
 	matrix.push_back(array_vector);
 }
 
-/**
- * Receveives the initial structure (step 2), containing:
- *  - neighbours_array
- *  - initial_temperature
- */
 void receive_init_struct()
 {
     const int src = 0;
@@ -74,13 +62,11 @@ void receive_init_struct()
     */
 }
 
-// Envoi temperature aux voisins
 void send_temperature_to_neighbours()
 {
     send_asynchronous_message_to_neighbours<float>(my_temperature, 1, MPI_FLOAT);
 }
 
-// Recevoir temperature des voisins
 vector<float> receive_temperatures_from_neighbours()
 {
     vector<float> temperatures;
@@ -90,7 +76,6 @@ vector<float> receive_temperatures_from_neighbours()
     return temperatures;
 }
 
-// Calculer la nouvelle temperature
 float compute_new_temperature_mean(const vector<float>& temperatures)
 {
     float temperature = my_temperature;
@@ -104,17 +89,12 @@ float compute_new_temperature_mean(const vector<float>& temperatures)
     return temperature;
 }
 
-// Envoi nouvelle temperature au coordinateur
 void send_new_temperature_to_coordinator(float new_temperature)
 {
     MPI_Send(&new_temperature, 1, MPI_FLOAT, coordinator_slave_id, 0, MPI_COMM_WORLD);
 }
 
 
-/**
- * Sends temperature to neighbours asynchroniously.
- * Receives neighbours' temperatures.
- */
 void temperatures_exchange()
 {
     // Envoi temperature aux voisins
@@ -132,7 +112,6 @@ void temperatures_exchange()
     send_new_temperature_to_coordinator(new_temperature);
 }
 
-// Fonction Reception d'un int
 int receive_simulation_step()
 {
     MPI_Status status;
@@ -143,7 +122,6 @@ int receive_simulation_step()
     return simulation_step;
 }
 
-// TODO: review this code (written by Del)
 /**
  * This is step 4
  */
@@ -158,13 +136,6 @@ void start_simulation()
         temperatures_exchange();
     }
     while (simulation_step > 0);
-
-    /*
-    if (simulation_step == SIMULATION_PHASE_ENDED)
-    {
-        mpi_debug(prog_name, myrank, parent, "simulation_step == SIMULATION_PHASE_ENDED");
-    }
-    */
 }
 
 
