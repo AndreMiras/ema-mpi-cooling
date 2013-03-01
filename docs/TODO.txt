@@ -1,4 +1,0 @@
-= TODO =
-
-- com should be async
-- plate should be any dimension (3x3, 3x4, ...)
