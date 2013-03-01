@@ -40,9 +40,7 @@ void mpi_debug(const string& prog_name, const int& rank, const MPI_Comm& parent,
 }
 
 
-// TODO[deprecated]: calculators_ids_matrix should later be computed dynamically
 float get_temperature(
-        const vector<vector<int> >& calculators_ids_matrix,
         const vector<vector<float> >& temperature_matrix,
         int calculator_number)
 {

@@ -419,9 +419,6 @@ void neighbour_array_creation_and_passing(const MPI_Comm& intercomm)
 
 	init_initial_temperature_matrix(initial_temperature_matrix, matrix_row_size, matrix_col_size);
 	init_calculators_ids_matrix(calculators_ids_matrix, matrix_row_size, matrix_col_size);
-	// cout << "calculators_ids_matrix[" << calculators_ids_matrix.size() << "][" << calculators_ids_matrix[0].size() << "] = ";
-	// display_matrix<int>(calculators_ids_matrix);
-	// cout << "initial_temperature_matrix[" << initial_temperature_matrix.size() << "][" << initial_temperature_matrix[0].size() << "] = ";
 	display_matrix<float>(initial_temperature_matrix);
 	int calculator_row, calculator_col;
 	// on ne communique qu'avec les calculateurs (le coordinateur a l'id 0)
@@ -429,7 +426,7 @@ void neighbour_array_creation_and_passing(const MPI_Comm& intercomm)
 	{
 		get_calculator_row_col(dest, matrix_row_size, matrix_col_size, calculator_row, calculator_col);
 		get_neighbours_array_from_matrix(
-				calculators_ids_matrix,
+				calculators_ids_matrix, // TODO: deprecated
 				matrix_row_size,
 				matrix_col_size,
 				calculator_row,
@@ -446,7 +443,7 @@ void neighbour_array_creation_and_passing(const MPI_Comm& intercomm)
 		// Sets neighbours_array and initial_temperature
 		calculator_init calculator_init1;
 		memcpy(calculator_init1.neighbours_array, neighbours_array, neighbours_array_size * sizeof(int));
-		calculator_init1.initial_temperature = get_temperature(calculators_ids_matrix, initial_temperature_matrix, dest);
+		calculator_init1.initial_temperature = get_temperature(initial_temperature_matrix, dest);
         /*
         string temperature_str = t_to_string(calculator_init1.initial_temperature);
         string message = "calculator_init1.initial_temperature = " + temperature_str;

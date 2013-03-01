@@ -13,11 +13,5 @@ MPI_Comm parent;
 
 vector<vector<float> > initial_temperature_matrix;
 
-
 float get_initial_temperature(int process);
-
-/**
- * returns the temperature of a given process
- */
-float get_temperature(int process);
 #endif /* MASTER_H_ */

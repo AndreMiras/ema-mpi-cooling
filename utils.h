@@ -102,7 +102,6 @@ std::string t_to_string(T i)
 }
 
 float get_temperature(
-        const vector<vector<int> >& calculators_ids_matrix,
         const vector<vector<float> >& temperature_matrix,
         int calculator_number);
 
