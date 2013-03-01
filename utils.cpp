@@ -39,6 +39,14 @@ void mpi_debug(const string& prog_name, const int& rank, const MPI_Comm& parent,
             ", message: " << message << endl;
 }
 
+int get_calculator_id(const int matrix_row_size, const int matrix_col_size, const int row, const int col)
+{
+    if ((row >= matrix_row_size) || (col >= matrix_col_size))
+    {
+        return NO_NEIGHBOUR_VALUE;
+    }
+    return (matrix_col_size * row) + (col + 1);
+}
 
 float get_temperature(
         const vector<vector<float> >& temperature_matrix,

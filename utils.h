@@ -56,6 +56,22 @@ static const int INIT_PHASE_ENDED = 0;
 
 void create_mpi_calculator_init_type(MPI_Datatype& mpi_calculator_init_type);
 
+/**
+ * retrieves calculator id from given matrix dimension and row/col couple
+ * e.g. given the following matrix dimension:
+ * matrix_row_size = 3
+ * matrix_col_size = 4
+ * we would have the following matrix:
+ * {
+ *  {1, 2, 3, 4},
+ *  {5, 6, 7, 8},
+ *  {9,10,11,12},
+ * }
+ * row = 1 & col = 0 would return 5
+ * coordinate outside the matrix would return -1
+ */
+int get_calculator_id(const int matrix_row_size, const int matrix_col_size, const int row, const int col);
+
 
 template <class T>
 void display_array(const T array[], const int array_size)

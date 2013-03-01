@@ -15,7 +15,6 @@ vector<vector<float> > initial_temperature_matrix;
 float get_initial_temperature(int process);
 
 int get_neighbour_from_matrix(
-	vector<vector<int> > matrix,
 	int matrix_row_size,
 	int matrix_col_size,
 	int row,

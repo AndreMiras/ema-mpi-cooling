@@ -8,7 +8,6 @@
 #define WEST			-1
 
 int get_neighbour_from_matrix(
-	vector<vector<int> > matrix,
 	int matrix_row_size,
 	int matrix_col_size,
 	int row,
@@ -24,7 +23,7 @@ int get_neighbour_from_matrix(
 	if((neighbour_row >= 0 && neighbour_row < matrix_row_size)
 	&& (neighbour_col >= 0 && neighbour_col < matrix_col_size))
 	{
-		neighbour = matrix[neighbour_row][neighbour_col];
+		neighbour = get_calculator_id(matrix_row_size, matrix_col_size, neighbour_row, neighbour_col);
 	}
 
 	return neighbour;
@@ -41,7 +40,6 @@ int get_neighbour_from_matrix(
  * => north_neighbour = 1
  */
 int get_north_neighbour_from_matrix(
-	vector<vector<int> > matrix,
 	int matrix_row_size,
 	int matrix_col_size,
 	int row,
@@ -51,7 +49,6 @@ int get_north_neighbour_from_matrix(
     int east_or_west = 0;
 
     return get_neighbour_from_matrix(
-            matrix,
             matrix_row_size,
             matrix_col_size,
             row,
@@ -65,7 +62,6 @@ int get_north_neighbour_from_matrix(
  * same as get_north_neighbour_from_matrix
  */
 int get_north_east_neighbour_from_matrix(
-	vector<vector<int> > matrix,
 	int matrix_row_size,
 	int matrix_col_size,
 	int row,
@@ -75,7 +71,6 @@ int get_north_east_neighbour_from_matrix(
     int east_or_west = EAST;
 
     return get_neighbour_from_matrix(
-            matrix,
             matrix_row_size,
             matrix_col_size,
             row,
@@ -89,7 +84,6 @@ int get_north_east_neighbour_from_matrix(
  * same as get_north_neighbour_from_matrix
  */
 int get_east_neighbour_from_matrix(
-	vector<vector<int> > matrix,
 	int matrix_row_size,
 	int matrix_col_size,
 	int row,
@@ -99,7 +93,6 @@ int get_east_neighbour_from_matrix(
     int east_or_west = EAST;
 
     return get_neighbour_from_matrix(
-            matrix,
             matrix_row_size,
             matrix_col_size,
             row,
@@ -113,7 +106,6 @@ int get_east_neighbour_from_matrix(
  * same as get_north_neighbour_from_matrix
  */
 int get_south_east_neighbour_from_matrix(
-	vector<vector<int> > matrix,
 	int matrix_row_size,
 	int matrix_col_size,
 	int row,
@@ -123,7 +115,6 @@ int get_south_east_neighbour_from_matrix(
     int east_or_west = EAST;
 
     return get_neighbour_from_matrix(
-            matrix,
             matrix_row_size,
             matrix_col_size,
             row,
@@ -137,7 +128,6 @@ int get_south_east_neighbour_from_matrix(
  * same as get_north_neighbour_from_matrix
  */
 int get_south_neighbour_from_matrix(
-	vector<vector<int> > matrix,
 	int matrix_row_size,
 	int matrix_col_size,
 	int row,
@@ -147,7 +137,6 @@ int get_south_neighbour_from_matrix(
     int east_or_west = 0;
 
     return get_neighbour_from_matrix(
-            matrix,
             matrix_row_size,
             matrix_col_size,
             row,
@@ -161,7 +150,6 @@ int get_south_neighbour_from_matrix(
  * same as get_north_neighbour_from_matrix
  */
 int get_south_west_neighbour_from_matrix(
-	vector<vector<int> > matrix,
 	int matrix_row_size,
 	int matrix_col_size,
 	int row,
@@ -171,7 +159,6 @@ int get_south_west_neighbour_from_matrix(
     int east_or_west = WEST;
 
     return get_neighbour_from_matrix(
-            matrix,
             matrix_row_size,
             matrix_col_size,
             row,
@@ -185,7 +172,6 @@ int get_south_west_neighbour_from_matrix(
  * same as get_north_neighbour_from_matrix
  */
 int get_west_neighbour_from_matrix(
-	vector<vector<int> > matrix,
 	int matrix_row_size,
 	int matrix_col_size,
 	int row,
@@ -195,7 +181,6 @@ int get_west_neighbour_from_matrix(
     int east_or_west = WEST;
 
     return get_neighbour_from_matrix(
-            matrix,
             matrix_row_size,
             matrix_col_size,
             row,
@@ -209,7 +194,6 @@ int get_west_neighbour_from_matrix(
  * same as get_north_neighbour_from_matrix
  */
 int get_north_west_neighbour_from_matrix(
-	vector<vector<int> > matrix,
 	int matrix_row_size,
 	int matrix_col_size,
 	int row,
@@ -219,7 +203,6 @@ int get_north_west_neighbour_from_matrix(
     int east_or_west = WEST;
 
     return get_neighbour_from_matrix(
-            matrix,
             matrix_row_size,
             matrix_col_size,
             row,
@@ -241,7 +224,6 @@ int get_north_west_neighbour_from_matrix(
  * => neighbours_array = {1, 2, 5, 8, 7, 6, 3, 0}
  */
 void get_neighbours_array_from_matrix(
-	vector<vector<int> > matrix,
 	int matrix_row_size,
 	int matrix_col_size,
 	int row,
@@ -250,21 +232,21 @@ void get_neighbours_array_from_matrix(
 	int neighbours_array_size)
 {
 	neighbours_array[0] = get_north_neighbour_from_matrix(		// NORTH
-		matrix, matrix_row_size, matrix_col_size, row, col);
+		matrix_row_size, matrix_col_size, row, col);
 	neighbours_array[1] = get_north_east_neighbour_from_matrix(	// NORTH-EAST
-		matrix, matrix_row_size, matrix_col_size, row, col);
+		matrix_row_size, matrix_col_size, row, col);
 	neighbours_array[2] = get_east_neighbour_from_matrix(		// EAST
-		matrix, matrix_row_size, matrix_col_size, row, col);
+		matrix_row_size, matrix_col_size, row, col);
 	neighbours_array[3] = get_south_east_neighbour_from_matrix(	// SOUTH-EAST
-		matrix, matrix_row_size, matrix_col_size, row, col);
+		matrix_row_size, matrix_col_size, row, col);
 	neighbours_array[4] = get_south_neighbour_from_matrix(		// SOUTH
-		matrix, matrix_row_size, matrix_col_size, row, col);
+		matrix_row_size, matrix_col_size, row, col);
 	neighbours_array[5] = get_south_west_neighbour_from_matrix(	// SOUTH-WEST
-		matrix, matrix_row_size, matrix_col_size, row, col);
+		matrix_row_size, matrix_col_size, row, col);
 	neighbours_array[6] = get_west_neighbour_from_matrix(		// WEST
-		matrix, matrix_row_size, matrix_col_size, row, col);
+		matrix_row_size, matrix_col_size, row, col);
 	neighbours_array[7] = get_north_west_neighbour_from_matrix(	// NORTH-WEST
-		matrix, matrix_row_size, matrix_col_size, row, col);
+		matrix_row_size, matrix_col_size, row, col);
 }
 
 void init_neighbours_array(int neighbours_array[], int neighbours_array_size)
@@ -441,7 +423,6 @@ void neighbour_array_creation_and_passing(const MPI_Comm& intercomm)
 	{
 		get_calculator_row_col(dest, matrix_row_size, matrix_col_size, calculator_row, calculator_col);
 		get_neighbours_array_from_matrix(
-				calculators_ids_matrix, // TODO: deprecated
 				matrix_row_size,
 				matrix_col_size,
 				calculator_row,
