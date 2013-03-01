@@ -1,7 +1,6 @@
 #ifndef CALCULATOR_SLAVE_H_
 #define CALCULATOR_SLAVE_H_
 #include "coordinator_slave.h"
-#include "utils.h"
 #include <cmath>
 #include <stdio.h>
 #include <stdlib.h>
@@ -113,10 +112,11 @@ void start_simulation(int simulation_step)
     vector<float> temperatures_array = receive_all_new_temperatures();
     float mean_temperature = compute_mean_temperature(temperatures_array);
 
-    float delta_temperature = abs(mean_temperature - current_temperature);
+    float delta_temperature = abs(mean_temperature - previous_mean_temperature);
     if (delta_temperature > epsilon)
     {
         simulation_step++;
+        previous_mean_temperature = mean_temperature;
         start_simulation(simulation_step);
     }
     /*
