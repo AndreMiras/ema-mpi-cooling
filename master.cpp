@@ -319,7 +319,7 @@ float get_initial_temperature(int process)
 {
 	float initial_temperature;
     // pour le moment on donne une temperature determinée pour les tests
-    // mais ça devra être aléatoire pour la suite
+    // mais ça pourrait être aléatoire pour la suite
     if (process == 1)
     {
         initial_temperature = 50.0;
@@ -417,7 +417,7 @@ MPI_Comm create_coordinator_slave_and_calculators_slaves()
 		// le pointeur vers l'espace de comm entre le groupe de départ et le groupe nouvellement créé (contenant les nouveaux processus)
 		&intercomm,
 		// un tableau d'entier pour stocker les codes de retour de chaque processus
-		errcodes // TODO: check the exit codes to see if everythings went OK
+		errcodes // TODO: we could check the exit codes to see if everything went OK
 	);
 
     mpi_debug(prog_name, myrank, parent, "Parent: I ran all instances.");

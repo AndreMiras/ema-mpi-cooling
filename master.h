@@ -6,7 +6,6 @@
 
 using namespace std;
 
-const int tag = 0;
 string prog_name;
 int myrank;
 MPI_Comm parent;

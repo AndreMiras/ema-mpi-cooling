@@ -102,7 +102,7 @@ void send_message_to_calculators(void* buffer, const int count, const MPI_Dataty
  * “Delta Tmoy” = “Tmoy_courant” - “Tmoy_new”
  * si “Delta Tmoy” >= Epsilon on recommence, sinon on envoie un message de fin aux calculateurs
  */
-void start_simulation(int simulation_step) // TODO: give relevant name
+void start_simulation(int simulation_step)
 {
     string message = "start_simulation simulation_step: " + t_to_string(simulation_step);
     mpi_debug(prog_name, myrank, parent, message);

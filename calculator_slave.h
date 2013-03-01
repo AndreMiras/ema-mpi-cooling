@@ -24,7 +24,6 @@ void receive_init_struct();
 void create_matrix_from_neighbours_array(const int neighbours_array[], const int array_size, const int myrank, vector<vector<int> >& matrix);
 
 
-// TODO: use generics rather than void
 /**
  * count represents the size of one buffers[] void element
  * i.e. sizeof(buffers[0]) == count
@@ -35,7 +34,6 @@ vector<T> receive_message_from_neighbours(const int count, const MPI_Datatype da
     vector<T> buffers;
     T buffer;
     MPI_Status status;
-    const int tag = 0; // TODO[DRY]: use global utils.h tag value
     int neighbour_id;
 
     for(int i=0; i<NB_NEIGHBOURS; i++)
@@ -47,7 +45,7 @@ vector<T> receive_message_from_neighbours(const int count, const MPI_Datatype da
         }
         else
         {
-            MPI_Recv(&buffer, count, datatype, neighbour_id, tag, MPI_COMM_WORLD, &status); // TODO: debug put back in
+            MPI_Recv(&buffer, count, datatype, neighbour_id, tag, MPI_COMM_WORLD, &status);
         }
         buffers.push_back(buffer);
     }

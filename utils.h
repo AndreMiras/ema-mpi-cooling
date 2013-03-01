@@ -29,12 +29,14 @@ static const float current_temperature = 20.0;
 
 static const int NO_NEIGHBOUR_VALUE = -1;
 
+static const int tag = 0;
+
 /*
  * Neighbours count.
  * It could be more or less than 8 neighbours,
  * for example if plates are not squared.
  */
-#define NB_NEIGHBOURS 8
+static const int NB_NEIGHBOURS = 8;
 /*
  * Contains calculator neighbour and initial temperature
  */

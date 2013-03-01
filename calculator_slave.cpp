@@ -50,7 +50,6 @@ void create_matrix_from_neighbours_array(const int neighbours_array[], const int
 void receive_init_struct()
 {
     const int src = 0;
-    const int tag = 0;
 	MPI_Status status;
 	MPI_Comm_rank(MPI_COMM_WORLD, &myrank);
 
