@@ -1,5 +1,10 @@
 = Release Notes =
 
+== version 4.1 ==
+	- code cleaning
+	- code comments
+	- refactoring
+
 == version 4.0 ==
 	- slaves calculators temperature exchanges and mean calculation
 	- slave coordinator mean calculation and calculators coordination
