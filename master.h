@@ -12,12 +12,6 @@ MPI_Comm parent;
 
 vector<vector<float> > initial_temperature_matrix;
 
-/*
- * Phase 3: un float correspondant à la temperature initiale du carré (fixée en dur, puis lue dans un fichier de config)
- * TODO: donner une temperature aléatoire
- */
-float get_initial_temperature(int process);
-
 int get_neighbour_from_matrix(
 	int matrix_row_size,
 	int matrix_col_size,
@@ -26,6 +20,9 @@ int get_neighbour_from_matrix(
     int north_or_south = 0,
     int east_or_west = 0);
 
+/**
+ * Returns north neighbour id of a given row/col process.
+ */
 int get_north_neighbour_from_matrix(
 	int matrix_row_size,
 	int matrix_col_size,
@@ -33,7 +30,7 @@ int get_north_neighbour_from_matrix(
 	int col);
 
 /*
- * same as get_north_neighbour_from_matrix
+ * Same as get_north_neighbour_from_matrix.
  */
 int get_north_east_neighbour_from_matrix(
 	int matrix_row_size,
@@ -42,7 +39,7 @@ int get_north_east_neighbour_from_matrix(
 	int col);
 
 /*
- * same as get_north_neighbour_from_matrix
+ * Same as get_north_neighbour_from_matrix.
  */
 int get_east_neighbour_from_matrix(
 	int matrix_row_size,
@@ -51,7 +48,7 @@ int get_east_neighbour_from_matrix(
 	int col);
 
 /*
- * same as get_north_neighbour_from_matrix
+ * Same as get_north_neighbour_from_matrix.
  */
 int get_south_east_neighbour_from_matrix(
 	int matrix_row_size,
@@ -60,7 +57,7 @@ int get_south_east_neighbour_from_matrix(
 	int col);
 
 /*
- * same as get_north_neighbour_from_matrix
+ * Same as get_north_neighbour_from_matrix.
  */
 int get_south_neighbour_from_matrix(
 	int matrix_row_size,
@@ -69,7 +66,7 @@ int get_south_neighbour_from_matrix(
 	int col);
 
 /*
- * same as get_north_neighbour_from_matrix
+ * Same as get_north_neighbour_from_matrix.
  */
 int get_south_west_neighbour_from_matrix(
 	int matrix_row_size,
@@ -78,7 +75,7 @@ int get_south_west_neighbour_from_matrix(
 	int col);
 
 /*
- * same as get_north_neighbour_from_matrix
+ * Same as get_north_neighbour_from_matrix.
  */
 int get_west_neighbour_from_matrix(
 	int matrix_row_size,
@@ -87,7 +84,7 @@ int get_west_neighbour_from_matrix(
 	int col);
 
 /*
- * same as get_north_neighbour_from_matrix
+ * Same as get_north_neighbour_from_matrix.
  */
 int get_north_west_neighbour_from_matrix(
 	int matrix_row_size,
@@ -130,5 +127,37 @@ int get_north_neighbour_from_matrix(
 	int matrix_col_size,
 	int row,
 	int col);
+
+/**
+ * Initialises temperature matrix.
+ */
+void init_initial_temperature_matrix(vector<vector<float> >& matrix, const int matrix_row_size, const int matrix_col_size);
+
+/**
+ * Helper function that returns initial temperature for a given process.
+ * We're currently giving a known (hardcoded) temperature for testing purposes,
+ * but that could easily be a random temperature.
+ */
+float get_initial_temperature(int process);
+
+/**
+ * Sends init phase ended message t coordinator.
+ */
+void send_init_phase_ended_message(const MPI_Comm& intercomm);
+
+/**
+ * Waits for end of simulation message from coordinator.
+ */
+void wait_simulation_phase_ended_message(const MPI_Comm& intercomm);
+
+/**
+ * Creates coordinator and slaves processes and returns the MPI_Comm used.
+ */
+MPI_Comm create_coordinator_slave_and_calculators_slaves();
+
+/**
+ * Creates the neighbours_array and send it to the calculators.
+ */
+void neighbour_array_creation_and_passing(const MPI_Comm& intercomm);
 
 #endif /* MASTER_H_ */

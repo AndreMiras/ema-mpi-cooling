@@ -206,14 +206,6 @@ void get_neighbours_array_from_matrix(
 		matrix_row_size, matrix_col_size, row, col);
 }
 
-void init_neighbours_array(int neighbours_array[], int neighbours_array_size)
-{
-	for (int i=0; i < neighbours_array_size; i++)
-	{
-		neighbours_array[i] = i;
-	}
-}
-
 void init_initial_temperature_matrix(vector<vector<float> >& matrix, const int matrix_row_size, const int matrix_col_size)
 {
 	vector<float> array;
@@ -236,8 +228,6 @@ void init_initial_temperature_matrix(vector<vector<float> >& matrix, const int m
 float get_initial_temperature(int process)
 {
 	float initial_temperature;
-    // pour le moment on donne une temperature determinée pour les tests
-    // mais ça pourrait être aléatoire pour la suite
     if (process == 1)
     {
         initial_temperature = 50.0;
@@ -293,7 +283,7 @@ void wait_simulation_phase_ended_message(const MPI_Comm& intercomm)
 MPI_Comm create_coordinator_slave_and_calculators_slaves()
 {
 	MPI_Status status;
-	MPI_Comm intercomm; // L'espace de communication père - fils
+    MPI_Comm intercomm; // communication space (parent - childs)
     int myrank;
     MPI_Comm parent;
     MPI_Comm_get_parent(&parent);
@@ -309,14 +299,10 @@ MPI_Comm create_coordinator_slave_and_calculators_slaves()
 		calculator_slave_count		// On lance y instances du programme 2
 	};
 
-	// Pas d'info supplémentaires pour contrôler le lancement
-	// des programmes 1 et 2
-
 	MPI_Info infos[nb_instances] = { MPI_INFO_NULL, MPI_INFO_NULL };
 
-	int errcodes[coordinator_slave_count + calculator_slave_count]; // Les codes de retours des processus
+	int errcodes[coordinator_slave_count + calculator_slave_count]; // processes error code return
 
-	// On lance simultanément x instances de prg1 et y instances de prg2
 	MPI_Comm_spawn_multiple(
 		// le nombre de programme (la taille des tableaux passés en paramètre).
 		nb_instances,
@@ -339,8 +325,6 @@ MPI_Comm create_coordinator_slave_and_calculators_slaves()
 	);
 
     mpi_debug(prog_name, myrank, parent, "Parent: I ran all instances.");
-	// Le père communique de façon synchrone avec chacun de
-	// ses fils en utilisant l'espace de communication intercomm
 
     return intercomm;
 }
@@ -353,7 +337,7 @@ void neighbour_array_creation_and_passing(const MPI_Comm& intercomm)
 	init_initial_temperature_matrix(initial_temperature_matrix, matrix_row_size, matrix_col_size);
 	display_matrix<float>(initial_temperature_matrix);
 	int calculator_row, calculator_col;
-	// on ne communique qu'avec les calculateurs (le coordinateur a l'id 0)
+	// communication with calculators (coordinator id is 0)
 	for (int dest = calculator_slave_first_id; dest <= calculator_slave_last_id; dest++)
 	{
 		get_calculator_row_col(dest, matrix_row_size, matrix_col_size, calculator_row, calculator_col);
@@ -408,7 +392,7 @@ void neighbour_array_creation_and_passing(const MPI_Comm& intercomm)
 
 int main(int argc, char *argv[])
 {
-	MPI_Comm intercomm; // L'espace de communication père - fils
+	MPI_Comm intercomm; // communication space (parent - childs)
 	MPI_Init(&argc, &argv);
     prog_name = argv[0];
     MPI_Comm_get_parent(&parent);
@@ -421,10 +405,10 @@ int main(int argc, char *argv[])
     // 2 Neighbour array and temperature creation and passing to childs
     neighbour_array_creation_and_passing(intercomm);
 
-	// 3 fin de la phase d'initialisation
+	// 3 End of initialisation phase
 	send_init_phase_ended_message(intercomm);
 
-	// Attend la fin de la simulation (message envoyé par le coordinateur
+	// Wait for end of simulation (sends by coordinator)
 	wait_simulation_phase_ended_message(intercomm);
 
     mpi_debug(prog_name, myrank, parent, "Master end");
