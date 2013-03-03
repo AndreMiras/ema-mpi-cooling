@@ -74,7 +74,7 @@ template <typename T>
 void display_matrix(const vector<vector<T> > matrix)
 {
 	cout << "{" << endl;
-	for (int row=0; row < matrix.size(); row++)
+	for (size_t row=0, matrix_size=matrix.size(); row < matrix_size; row++)
 	{
 		cout << "  ";
 		display_array<T>(matrix[row].data(), matrix[row].size());

@@ -282,7 +282,6 @@ void wait_simulation_phase_ended_message(const MPI_Comm& intercomm)
 
 MPI_Comm create_coordinator_slave_and_calculators_slaves()
 {
-	MPI_Status status;
     MPI_Comm intercomm; // communication space (parent - childs)
     int myrank;
     MPI_Comm parent;

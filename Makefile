@@ -1,5 +1,7 @@
 CC=mpic++
-CFLAGS = -g
+ifndef CFLAGS
+	CFLAGS = -Wall -g
+endif
 OBJDIR := dist/MPIcpp/GNU-Linux-x86/
 MKDIR_P = mkdir -p
 

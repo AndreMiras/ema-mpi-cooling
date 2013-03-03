@@ -127,8 +127,6 @@ void start_simulation()
 
 int main(int argc, char *argv[])
 {
-	MPI_Status status;
-
 	prog_name = argv[0];
 	MPI_Init(&argc, &argv);
 
