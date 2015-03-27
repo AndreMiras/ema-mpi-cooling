@@ -1,0 +1,1 @@
+OpenMPI School project
